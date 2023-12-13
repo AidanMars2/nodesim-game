@@ -10,8 +10,11 @@ class GameData {
     var circuit = Circuit()
     var selectionLocation1 = WorldLocation(0, 0)
     var selectionLocation2 = WorldLocation(0, 0)
+    var sl2ShouldChaseMouse = false
+    var showSelection = false
     var currentPlaceType = NodeType.Switch
     var wasdKeysPressed = BooleanArray(4)
+    var currentTool = ToolType.Interact
 
     fun getVirtualScreenLocation(worldLocation: WorldLocation): VirtualScreenLocation =
         VirtualScreenLocation((worldLocation.x - playerX) * scale, (worldLocation.y - playerY) * scale)

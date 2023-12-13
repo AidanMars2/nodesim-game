@@ -14,11 +14,10 @@ abstract class Window(val title: String) {
     var window: Long = 0
     var width: Int = 0
     var height: Int = 0
-    var dpi: Float = 1f
-    var xpos: Int = 0
-    var ypos: Int = 0
-    var vsync: Boolean = true
-    var stats: Boolean = true
+    private var dpi: Float = 1f
+    var xPos: Int = 0
+    var yPos: Int = 0
+    private var vsync: Boolean = true
     private lateinit var refreshRates: IntArray
     private val os = System.getProperty("os.name").lowercase(Locale.getDefault())
 
@@ -35,6 +34,7 @@ abstract class Window(val title: String) {
         refreshRates = getRefreshRates()
 
         createWindow(bounds)
+        init()
         loop()
 
         glfwFreeCallbacks(window)
@@ -74,8 +74,8 @@ abstract class Window(val title: String) {
 
         glfwSetWindowPos(window, bounds.left, bounds.top)
         updateDimensions()
-        xpos = width / 2
-        ypos = height / 2
+        xPos = width / 2
+        yPos = height / 2
 
         glfwMakeContextCurrent(window)
         glfwSwapInterval(if (vsync) 1 else 0) // Enable v-sync
@@ -129,11 +129,11 @@ abstract class Window(val title: String) {
 
         glfwSetCursorPosCallback(window) { window: Long, xpos: Double, ypos: Double ->
             if (os.contains("mac") || os.contains("darwin")) {
-                this.xpos = xpos.toInt()
-                this.ypos = ypos.toInt()
+                this.xPos = xpos.toInt()
+                this.yPos = ypos.toInt()
             } else {
-                this.xpos = (xpos / dpi).toInt()
-                this.ypos = (ypos / dpi).toInt()
+                this.xPos = (xpos / dpi).toInt()
+                this.yPos = (ypos / dpi).toInt()
             }
         }
 
@@ -150,6 +150,7 @@ abstract class Window(val title: String) {
             glfwSwapBuffers(window)
             glfwPollEvents()
         }
+        terminate()
     }
 
     abstract fun onKeyPress(window: Long, key: Int, scanCode: Int, action: Int, mods: Int)
@@ -157,4 +158,8 @@ abstract class Window(val title: String) {
     abstract fun onScroll(window: Long, xOffset: Double, yOffset: Double)
 
     abstract fun onMouseButtonEvent(window: Long, button: Int, action: Int, mods: Int)
+
+    abstract fun init()
+
+    abstract fun terminate()
 }

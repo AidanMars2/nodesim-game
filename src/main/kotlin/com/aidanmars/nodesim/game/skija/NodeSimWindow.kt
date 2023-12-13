@@ -1,35 +1,38 @@
 package com.aidanmars.nodesim.game.skija
 
-import com.aidanmars.nodesim.core.SIZE_CHUNK
-import com.aidanmars.nodesim.core.SIZE_TILE
+import com.aidanmars.nodesim.game.skija.Constants.SIZE_CHUNK
+import com.aidanmars.nodesim.game.skija.Constants.SIZE_TILE
+import com.aidanmars.nodesim.game.skija.hud.HudElement
+import com.aidanmars.nodesim.game.skija.hud.HudElementGroup
+import com.aidanmars.nodesim.game.skija.hud.PlaceHudElement
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.Paint
 import io.github.humbleui.types.IRect
-import io.github.humbleui.types.Point
-import org.lwjgl.glfw.GLFW
+import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import kotlin.math.ceil
 import kotlin.math.max
 
 class NodeSimWindow : Window("NodeSim") {
     val data = GameData()
+    val HUDElements = mutableListOf<HudElement>() // elements later in the list have priority
+    val hudElementGroup = HudElementGroup()
 
     fun runGame() {
         GLFWErrorCallback.createPrint(System.err).set()
-        check(GLFW.glfwInit()) { "Unable to initialize GLFW" }
+        check(glfwInit()) { "Unable to initialize GLFW" }
 
-        val vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())
+        val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor())
         val width = (vidmode!!.width() * 0.75).toInt()
         val height = (vidmode.height() * 0.75).toInt()
         val bounds = IRect.makeXYWH(
-            max(0.0, ((vidmode.width() - width) / 2).toDouble()).toInt(),
-            max(0.0, ((vidmode.height() - height) / 2).toDouble()).toInt(),
+            max(0f, ((vidmode.width() - width) / 2).toFloat()).toInt(),
+            max(0f, ((vidmode.height() - height) / 2).toFloat()).toInt(),
             width,
             height
         )
         run(bounds)
     }
-
     fun getVirtualScreenLocation(trueScreenX: Float, trueScreenY: Float): VirtualScreenLocation {
         return VirtualScreenLocation(trueScreenX - (width / 2), trueScreenY - (height / 2))
     }
@@ -51,21 +54,77 @@ class NodeSimWindow : Window("NodeSim") {
     )
 
     override fun onKeyPress(window: Long, key: Int, scanCode: Int, action: Int, mods: Int) {
+        if (window != this.window) return
+        var didBreak = false
+        if (action == GLFW_PRESS) {
+            for (index in HUDElements.indices.reversed()) {
+                if (!HUDElements[index].isFocused) continue
+                if (HUDElements[index].onKeyEvent(this, key, mods)) {
+                    didBreak = true
+                    break
+                }
+            }
+        }
+        if (!didBreak) {
+            onKeyEvent(key, action)
+        }
+    }
+
+    private fun onKeyEvent(key: Int, action: Int) {
+        //TODO: handle keys for the main area
     }
 
     override fun onScroll(window: Long, xOffset: Double, yOffset: Double) {
+        //TODO: handle scale changing
     }
 
     override fun onMouseButtonEvent(window: Long, button: Int, action: Int, mods: Int) {
+        if (window != this.window || button != GLFW_MOUSE_BUTTON_1) return
+        if (action == GLFW_PRESS) {
+            var didBreak = false
+            for (index in HUDElements.indices.reversed()) {
+                if (HUDElements[index].isHidden) continue
+                if (HUDElements[index].onClick(this, Point(xPos.toFloat(), yPos.toFloat()))) {
+                    didBreak = true
+                    break
+                }
+            }
+            if (!didBreak) {
+                data.selectionLocation1 = data.getWorldLocation(
+                    getVirtualScreenLocation(xPos.toFloat(), yPos.toFloat())
+                )
+            }
+        } else if (action == GLFW_RELEASE) {
+            data.selectionLocation2 = data.getWorldLocation(
+                getVirtualScreenLocation(xPos.toFloat(), yPos.toFloat())
+            )
+        }
+    }
+
+    fun initHudElements() {
+        HUDElements.add(PlaceHudElement())
+    }
+
+
+    override fun init() {
+        initHudElements()
+    }
+
+    override fun terminate() {
+        //TODO: do whatever needs to be done upon closing
     }
 
     override fun draw(canvas: Canvas) {
         canvas.clear(Colors.background)
         drawBackground(canvas)
+
+        //TODO: draw nodes and wires
+
+        drawHUD(canvas)
     }
 
     private fun drawBackground(canvas: Canvas) {
-        val tileSize = data.scale * Constants.SIZE_TILE
+        val tileSize = data.scale * SIZE_TILE
         val (worldTopLeftX, worldTopLeftY) = topLeftScreenLocation()
 
         val worldOriginX = worldTopLeftX - (worldTopLeftX % SIZE_TILE)
@@ -125,6 +184,14 @@ class NodeSimWindow : Window("NodeSim") {
             }
             if (screenY.toInt() in -3..height) {
                 canvas.drawLine(0f, screenY, xMax, screenY, it)
+            }
+        }
+    }
+
+    private fun drawHUD(canvas: Canvas) {
+        HUDElements.forEach {
+            if (!it.isHidden) {
+                it.draw(this, canvas)
             }
         }
     }
