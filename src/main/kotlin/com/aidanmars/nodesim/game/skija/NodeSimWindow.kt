@@ -1,17 +1,25 @@
 package com.aidanmars.nodesim.game.skija
 
+import com.aidanmars.nodesim.core.Node
+import com.aidanmars.nodesim.core.NodeType
+import com.aidanmars.nodesim.core.extensions.tick
+import com.aidanmars.nodesim.core.getChunk
 import com.aidanmars.nodesim.game.skija.Constants.SIZE_CHUNK
 import com.aidanmars.nodesim.game.skija.Constants.SIZE_TILE
 import com.aidanmars.nodesim.game.skija.hud.HudElement
 import com.aidanmars.nodesim.game.skija.hud.HudElementGroup
-import com.aidanmars.nodesim.game.skija.hud.PlaceHudElement
+import com.aidanmars.nodesim.game.skija.world.drawNode
+import com.aidanmars.nodesim.game.skija.world.drawWire
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.Paint
 import io.github.humbleui.types.IRect
+import io.github.humbleui.types.Point
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.pow
 
 class NodeSimWindow : Window("NodeSim") {
     val data = GameData()
@@ -26,30 +34,31 @@ class NodeSimWindow : Window("NodeSim") {
         val width = (vidmode!!.width() * 0.75).toInt()
         val height = (vidmode.height() * 0.75).toInt()
         val bounds = IRect.makeXYWH(
-            max(0f, ((vidmode.width() - width) / 2).toFloat()).toInt(),
-            max(0f, ((vidmode.height() - height) / 2).toFloat()).toInt(),
+            max(0, (vidmode.width() - width) / 2),
+            max(0, (vidmode.height() - height) / 2),
             width,
             height
         )
         run(bounds)
     }
+
     fun getVirtualScreenLocation(trueScreenX: Float, trueScreenY: Float): VirtualScreenLocation {
         return VirtualScreenLocation(trueScreenX - (width / 2), trueScreenY - (height / 2))
     }
 
-    fun getTrueScreenLocation(virtualScreenLocation: VirtualScreenLocation): Pair<Float, Float> {
-        return virtualScreenLocation.x + (width / 2) to virtualScreenLocation.y + (height / 2)
+    fun getTrueScreenLocation(virtualScreenLocation: VirtualScreenLocation): Point {
+        return Point(virtualScreenLocation.x + (width / 2), virtualScreenLocation.y + (height / 2))
     }
 
-    fun getTrueScreenLocation(worldLocation: WorldLocation): Pair<Float, Float> {
+    fun getTrueScreenLocation(worldLocation: WorldLocation): Point {
         return getTrueScreenLocation(data.getVirtualScreenLocation(worldLocation))
     }
 
-    fun topLeftScreenLocation() = data.getWorldLocation(
+    private fun topLeftScreenLocation() = data.getWorldLocation(
         getVirtualScreenLocation(0f, 0f)
     )
 
-    fun bottomRightScreenLocation() = data.getWorldLocation(
+    private fun bottomRightScreenLocation() = data.getWorldLocation(
         getVirtualScreenLocation(width.toFloat(), height.toFloat())
     )
 
@@ -71,11 +80,44 @@ class NodeSimWindow : Window("NodeSim") {
     }
 
     private fun onKeyEvent(key: Int, action: Int) {
-        //TODO: handle keys for the main area
+        if (action == GLFW_PRESS) {
+            when (key) {
+                GLFW_KEY_1, GLFW_KEY_2, GLFW_KEY_3, GLFW_KEY_4, GLFW_KEY_5 -> onNodeKeyEvent(key)
+                GLFW_KEY_E -> data.currentTool = ToolType.Place
+                GLFW_KEY_R -> data.currentTool = ToolType.Delete
+                GLFW_KEY_T -> data.currentTool = ToolType.Interact
+                GLFW_KEY_W -> data.wasdKeysPressed[0] = true
+                GLFW_KEY_A -> data.wasdKeysPressed[1] = true
+                GLFW_KEY_S -> data.wasdKeysPressed[2] = true
+                GLFW_KEY_D -> data.wasdKeysPressed[3] = true
+            }
+        } else if (action == GLFW_RELEASE) {
+            when (key) {
+                GLFW_KEY_W -> data.wasdKeysPressed[0] = false
+                GLFW_KEY_A -> data.wasdKeysPressed[1] = false
+                GLFW_KEY_S -> data.wasdKeysPressed[2] = false
+                GLFW_KEY_D -> data.wasdKeysPressed[3] = false
+            }
+        }
+    }
+
+    private fun onNodeKeyEvent(key: Int) {
+        data.currentTool = ToolType.Place
+        data.currentPlaceType = when (key) {
+            GLFW_KEY_1 -> NodeType.Switch
+            GLFW_KEY_2 -> NodeType.Light
+            GLFW_KEY_3 -> NodeType.NorGate
+            GLFW_KEY_4 -> NodeType.AndGate
+            GLFW_KEY_5 -> NodeType.XorGate
+            else -> throw IllegalArgumentException("no node with that key bind")
+        }
     }
 
     override fun onScroll(window: Long, xOffset: Double, yOffset: Double) {
-        //TODO: handle scale changing
+        val scaleDifference = 1.1.pow(yOffset)
+        data.scale *= scaleDifference.toFloat()
+        data.scale = data.scale.coerceAtMost(10f)
+        data.scale = data.scale.coerceAtLeast(0.1f)
     }
 
     override fun onMouseButtonEvent(window: Long, button: Int, action: Int, mods: Int) {
@@ -90,23 +132,26 @@ class NodeSimWindow : Window("NodeSim") {
                 }
             }
             if (!didBreak) {
-                data.selectionLocation1 = data.getWorldLocation(
+                data.handleMousePress(data.getWorldLocation(
                     getVirtualScreenLocation(xPos.toFloat(), yPos.toFloat())
-                )
+                ))
             }
         } else if (action == GLFW_RELEASE) {
-            data.selectionLocation2 = data.getWorldLocation(
+            data.handleMouseRelease(data.getWorldLocation(
                 getVirtualScreenLocation(xPos.toFloat(), yPos.toFloat())
-            )
+            ))
         }
     }
 
     fun initHudElements() {
-        HUDElements.add(PlaceHudElement())
+        hudElementGroup.addAllToList(HUDElements)
     }
 
-
     override fun init() {
+        val first = data.circuit.createNode(10, 10, NodeType.SwitchOn)
+        val second = data.circuit.createNode(100, 100, NodeType.Light)
+        data.circuit.connectNodes(first, second)
+        data.circuit.tick(3u)
         initHudElements()
     }
 
@@ -114,13 +159,65 @@ class NodeSimWindow : Window("NodeSim") {
         //TODO: do whatever needs to be done upon closing
     }
 
+    fun closeGraceFully() {
+        glfwSetWindowShouldClose(window, true)
+    }
+
     override fun draw(canvas: Canvas) {
+        if (data.sl2ShouldChaseMouse) data.selectionLocation2 =
+            data.getWorldLocation(getVirtualScreenLocation(xPos.toFloat(), yPos.toFloat()))
         canvas.clear(Colors.background)
         drawBackground(canvas)
 
-        //TODO: draw nodes and wires
+        drawNodesAndWires(canvas)
 
         drawHUD(canvas)
+    }
+
+    private fun drawNodesAndWires(canvas: Canvas) {
+        val topLeftWorldLocation = topLeftScreenLocation()
+        val bottomRightWorldLocation = bottomRightScreenLocation()
+        val topLeftChunk = getChunk(topLeftWorldLocation.x, topLeftWorldLocation.y)
+        val bottomRightChunk = getChunk(bottomRightWorldLocation.x, bottomRightWorldLocation.y)
+        val chunks = ArrayList<Set<Node>>(
+            abs(bottomRightChunk.first - topLeftChunk.first) *
+            abs(bottomRightChunk.second - topLeftChunk.second)
+        )
+        for (chunkX in topLeftChunk.first..bottomRightChunk.first) {
+            for (chunkY in topLeftChunk.second..bottomRightChunk.second) {
+                val chunk = data.circuit.chunks[chunkX, chunkY]
+                if (chunk === null) continue
+                chunks.add(chunk)
+
+                chunk.forEach {
+                    drawNode(it, this, canvas)
+                }
+            }
+        }
+        drawWires(chunks, canvas)
+    }
+
+    private fun drawWires(chunks: List<Set<Node>>, canvas: Canvas) {
+        chunks.forEach { chunk ->
+            chunk.forEach { node ->
+                node.inputNodes.forEach {
+                    drawWire1(it, node, canvas)
+                }
+                node.outputNodes.forEach {
+                    drawWire1(node, it, canvas)
+                }
+            }
+        }
+    }
+
+    private fun drawWire1(from: Node, to: Node, canvas: Canvas) {
+        drawWire(
+            getTrueScreenLocation(WorldLocation(from.x, from.y)),
+            getTrueScreenLocation(WorldLocation(to.x, to.y)),
+            from.outputPower,
+            data.scale,
+            canvas
+        )
     }
 
     private fun drawBackground(canvas: Canvas) {
@@ -132,9 +229,10 @@ class NodeSimWindow : Window("NodeSim") {
         val chunkX = (worldOriginX / SIZE_TILE) % SIZE_CHUNK
         val chunkY = (worldOriginY / SIZE_TILE) % SIZE_CHUNK
 
-        var (screenOriginX, screenOriginY) = getTrueScreenLocation(WorldLocation(worldOriginX, worldOriginY))
-        screenOriginX *= data.scale
-        screenOriginY *= data.scale
+        val (screenOriginX, screenOriginY) = getTrueScreenLocation(WorldLocation(
+            worldOriginX,
+            worldOriginY
+        ))
 
         val numTilesX = (ceil(width / tileSize).toInt() + 2)
         val numTilesY = (ceil(height / tileSize).toInt() + 2)
@@ -176,7 +274,8 @@ class NodeSimWindow : Window("NodeSim") {
         }
         Paint().use {
             it.color = Colors.zeroZeroLine
-            it.strokeWidth = 5f * data.scale
+            it.strokeWidth = 7f
+            if (data.scale > 1f) it.strokeWidth *= data.scale
 
             val (screenX, screenY) = getTrueScreenLocation(WorldLocation(0, 0))
             if (screenX.toInt() in -3..width) {

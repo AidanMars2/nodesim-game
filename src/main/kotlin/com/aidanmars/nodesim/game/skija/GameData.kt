@@ -24,4 +24,12 @@ class GameData {
             ((virtualScreenLocation.x / scale) + playerX).toInt(),
             ((virtualScreenLocation.y / scale) + playerY).toInt()
         )
+
+    fun handleMousePress(mouseLocation: WorldLocation) {
+        //TODO: do things here
+    }
+
+    fun handleMouseRelease(mouseLocation: WorldLocation) {
+        //TODO: do things here
+    }
 }

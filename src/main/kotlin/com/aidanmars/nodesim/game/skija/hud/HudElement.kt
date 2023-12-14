@@ -1,8 +1,8 @@
 package com.aidanmars.nodesim.game.skija.hud
 
 import com.aidanmars.nodesim.game.skija.NodeSimWindow
-import com.aidanmars.nodesim.game.skija.Point
 import io.github.humbleui.skija.Canvas
+import io.github.humbleui.types.Point
 
 interface HudElement {
     var isHidden: Boolean

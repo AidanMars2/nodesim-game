@@ -1,28 +1,28 @@
-package com.aidanmars.nodesim.game.skija.hud
+package com.aidanmars.nodesim.game.skija.hud.elements
 
 import com.aidanmars.nodesim.game.skija.Colors
 import com.aidanmars.nodesim.game.skija.NodeSimWindow
-import com.aidanmars.nodesim.game.skija.Point
 import com.aidanmars.nodesim.game.skija.ToolType
+import com.aidanmars.nodesim.game.skija.*
+import com.aidanmars.nodesim.game.skija.hud.HudElement
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.Paint
 import io.github.humbleui.skija.PaintStrokeCap
+import io.github.humbleui.types.Point
 
 class PlaceHudElement : HudElement {
     override var isHidden: Boolean = false
     override var isFocused: Boolean = false
 
     override fun draw(window: NodeSimWindow, canvas: Canvas) {
-        val (x, y) = getButtonPoint(window)
-        Paint().use {
-            val selected = window.data.currentTool == ToolType.Place
-            it.color = if (selected) Colors.placeElementBorderSelected else Colors.placeElementBorder
-            canvas.drawCircle(x, y, 35f, it)
+        val point = getButtonPoint(window)
+        val (x, y) = point
+        if (window.data.currentTool == ToolType.Place) {
+            canvas.drawCircle(point, 40f, Colors.toolbarElementBorderSelected)
         }
-        Paint().use {
-            it.color = Colors.placeElementMain
-            canvas.drawCircle(x, y, 30f, it)
-        }
+        canvas.drawCircle(point, 35f, Colors.placeElementBorder)
+        canvas.drawCircle(point, 30f, Colors.placeElementMain)
+
         Paint().use {
             it.color = Colors.placeElementPlus
             it.strokeWidth = 5f
