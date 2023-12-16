@@ -24,6 +24,7 @@ object Colors {
     val connectElementMain = Color.makeRGB(128, 128, 128)
     val connectElementBorder = Color.makeRGB(42, 42, 42)
     val connectElementIcon = Color.makeRGB(0, 0, 0)
+    val snapElementMain = Color.makeRGB(255, 255, 255)
 
     // node colors
     val nodeEdge = Color.makeRGB(0, 0, 0)

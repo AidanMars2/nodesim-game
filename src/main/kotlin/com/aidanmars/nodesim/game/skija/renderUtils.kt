@@ -28,7 +28,7 @@ fun Canvas.drawCircle(
 }
 
 fun angleBetweenPoints(point1: Point, point2: Point): Float {
-    val dx = point1.x - point2.x
-    val dy = point1.y - point2.y
-    return atan(dx / dy) + if (dy > 0) PI.toFloat() else 0f
+    val dx = point2.x - point1.x
+    val dy = point2.y - point1.y
+    return atan(dy / dx) + if (dx < 0) PI.toFloat() else 0f
 }

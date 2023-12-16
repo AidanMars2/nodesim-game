@@ -4,6 +4,7 @@ import com.aidanmars.nodesim.game.skija.Colors
 import com.aidanmars.nodesim.game.skija.*
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.Paint
+import io.github.humbleui.skija.PaintStrokeCap
 import io.github.humbleui.types.Point
 
 object Nodes {
@@ -109,6 +110,7 @@ object Nodes {
         Paint().use {
             it.color = Colors.nodeStructure
             it.strokeWidth = XorLineWidth * scale
+            it.strokeCap = PaintStrokeCap.ROUND
             canvas.drawLine(xMin, yMin, xMax, yMax, it)
             canvas.drawLine(xMin, yMax, xMax, yMin, it)
         }

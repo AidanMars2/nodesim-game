@@ -98,6 +98,11 @@
             <version>1.9.21</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.7.3</version>
+        </dependency>
+        <dependency>
             <groupId>io.github.humbleui</groupId>
             <artifactId>skija-linux-x64</artifactId>
             <version>0.116.1</version>
