@@ -18,7 +18,7 @@ class NorGateHudElement : HudElement {
         if (window.data.currentPlaceType === NodeType.NorGate) {
             canvas.drawCircle(getButtonPoint(window), 35f, Colors.toolbarElementBorderSelected)
         }
-        Nodes.drawNorGate(getButtonPoint(window), false, 1.5f, canvas)
+        Nodes.drawNorGate(getButtonPoint(window), true, 1.5f, canvas)
     }
 
     override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {

@@ -11,8 +11,8 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-private const val LineEdgeWidth = 10f
-private const val LineWidth = 4f
+private const val LineEdgeWidth = 7f
+private const val LineWidth = 3f
 
 fun drawWire(
     from: Point, to: Point,
@@ -34,9 +34,9 @@ fun drawWire(
     }
 }
 
-private const val triangleAngle = (PI / 8) * 6
-private const val outerTriangleDistance = 16f
-private const val innerTriangleDistance = 12f
+private const val triangleAngle = (PI / 4) * 3
+private const val outerTriangleDistance = 12f
+private const val innerTriangleDistance = 9f
 
 private fun drawWireTriangle(
     from: Point, to: Point,

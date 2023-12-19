@@ -1,9 +1,14 @@
 package com.aidanmars.nodesim.game.skija
 
 import io.github.humbleui.skija.Canvas
+import io.github.humbleui.skija.Data
 import io.github.humbleui.skija.Paint
 import io.github.humbleui.skija.Shader
+import io.github.humbleui.skija.svg.SVGDOM
+import io.github.humbleui.skija.svg.SVGLength
+import io.github.humbleui.skija.svg.SVGPreserveAspectRatio
 import io.github.humbleui.types.Point
+import io.github.humbleui.types.Rect
 import kotlin.math.PI
 import kotlin.math.atan
 
@@ -32,3 +37,27 @@ fun angleBetweenPoints(point1: Point, point2: Point): Float {
     val dy = point2.y - point1.y
     return atan(dy / dx) + if (dx < 0) PI.toFloat() else 0f
 }
+
+fun Canvas.drawSvg(dom: SVGDOM, point: Point, size: Point) {
+    save()
+    translate(point.x, point.y)
+    clipRect(Rect.makeXYWH(0f, 0f, size.x, size.y))
+    dom.root!!.use {
+        it.setWidth(SVGLength(size.x))
+            .setHeight(SVGLength(size.y))
+            .setPreserveAspectRatio(SVGPreserveAspectRatio())
+    }
+    dom.render(this)
+    restore()
+
+    translate(0f, 0f)
+}
+
+fun getSvgFromResource(resource: String): SVGDOM = SVGDOM(
+    Data.makeFromBytes(
+        Thread.currentThread()
+            .contextClassLoader
+            .getResource(resource)!!
+            .readBytes()
+    )
+)

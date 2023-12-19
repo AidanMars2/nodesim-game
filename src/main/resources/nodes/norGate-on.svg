@@ -1,0 +1,14 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0,0,54,54">
+    <defs>
+        <radialGradient id="glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color:rgb(0,230,255);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgb(0,230,255);stop-opacity:0" />
+        </radialGradient>
+    </defs>
+    <g transform="translate(27, 27)" fill-rule="nonzero" stroke-width="2" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" style="mix-blend-mode: normal">
+        <circle cx="0" cy="0" r="27" fill="url(#glow)"/>
+        <circle cx="0" cy="0" r="19" fill="rgb(192, 192, 192)" stroke="black"/>
+        <circle cx="0" cy="0" r="14" fill="rgb(0, 230, 255)" stroke="black" />
+        <circle cx="0" cy="0" r="9" fill="rgb(192, 192, 192)" stroke="black"/>
+    </g>
+</svg>

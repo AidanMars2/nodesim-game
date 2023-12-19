@@ -74,6 +74,6 @@ class SnapHudElement: HudElement {
     }
 
     private fun getButtonPoint(window: NodeSimWindow): Point {
-        return Point(window.width - 60f, 140f)
+        return Point(window.width - 60f, 200f)
     }
 }

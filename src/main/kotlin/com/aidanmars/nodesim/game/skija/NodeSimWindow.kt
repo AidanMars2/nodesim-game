@@ -20,6 +20,8 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.pow
 
+//TODO: circuit saving/blueprints
+//TODO: advanced circuit manipulation(copying, pasting, cutting, mass deletion, packaging)
 class NodeSimWindow : Window("NodeSim") {
     val data = GameData(
         ::topLeftScreenLocation,
@@ -177,6 +179,16 @@ class NodeSimWindow : Window("NodeSim") {
     }
 
     override fun draw(canvas: Canvas) {
+        doGameUpdate()
+        canvas.clear(Colors.background)
+        drawBackground(canvas)
+
+        drawNodesAndWires(canvas)
+
+        drawHUD(canvas)
+    }
+
+    private fun doGameUpdate() {
         val currentTime = System.currentTimeMillis()
         val multiplier = (currentTime - lastDrawCallDate).toFloat()
         lastDrawCallDate = currentTime
@@ -187,12 +199,6 @@ class NodeSimWindow : Window("NodeSim") {
         if (data.sl2ShouldChaseMouse) data.moveSl2InChase(
             data.getWorldLocation(getVirtualScreenLocation(xPos.toFloat(), yPos.toFloat()))
         )
-        canvas.clear(Colors.background)
-        drawBackground(canvas)
-
-        drawNodesAndWires(canvas)
-
-        drawHUD(canvas)
     }
 
     private fun drawNodesAndWires(canvas: Canvas) {
@@ -263,7 +269,7 @@ class NodeSimWindow : Window("NodeSim") {
         if (data.scale >= 0.125f) {
             Paint().use {
                 it.color = Colors.tileLine
-                it.strokeWidth = 3f * data.scale
+                it.strokeWidth = 2f * data.scale
 
                 var x = screenOriginX
                 for (index in 0..numTilesX) {
@@ -279,7 +285,7 @@ class NodeSimWindow : Window("NodeSim") {
         }
         Paint().use {
             it.color = Colors.chunkLine
-            it.strokeWidth = 4f * data.scale
+            it.strokeWidth = 3f * data.scale
 
             val chunkSize = tileSize * SIZE_CHUNK
             var x = screenOriginX - (chunkX * tileSize)
@@ -295,7 +301,7 @@ class NodeSimWindow : Window("NodeSim") {
         }
         Paint().use {
             it.color = Colors.zeroZeroLine
-            it.strokeWidth = 7f
+            it.strokeWidth = 6f
             if (data.scale > 1f) it.strokeWidth *= data.scale
 
             val (screenX, screenY) = getTrueScreenLocation(WorldLocation(0, 0))
@@ -309,12 +315,12 @@ class NodeSimWindow : Window("NodeSim") {
     }
 
     private fun drawHUD(canvas: Canvas) {
+        drawSelection(canvas)
         HUDElements.forEach {
             if (!it.isHidden) {
                 it.draw(this, canvas)
             }
         }
-        drawSelection(canvas)
     }
 
     private fun drawSelection(canvas: Canvas) {

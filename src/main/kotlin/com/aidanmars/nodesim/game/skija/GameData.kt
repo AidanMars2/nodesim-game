@@ -45,6 +45,7 @@ class GameData(
     private val circuitMutex = Mutex()
     private var isSimulating = false
     var placeSnapDistance = 1
+    private var interactionDrag = false
 
     fun startSimulation() {
         if (isSimulating) return
@@ -86,8 +87,9 @@ class GameData(
         selectionLocation2 = newLocation
         when (currentTool) {
             ToolType.Interact -> {
-                if (newLocation.distanceTo(selectionLocation1) >= 20.0) {
+                if (newLocation.distanceTo(selectionLocation1) >= 20.0 || interactionDrag) {
                     placeNodeAtLocation(selectedNode?.first ?: return, newLocation)
+                    interactionDrag = true
                 }
             }
             else -> {}
@@ -100,7 +102,11 @@ class GameData(
     }
 
     fun getNodePlaceLocation(location: WorldLocation): WorldLocation {
-        return WorldLocation(floor(location.x + 0.5f).toInt(), floor(location.y + 0.5f).toInt())
+        if (placeSnapDistance == 1) return location
+        return WorldLocation(
+            (floor((location.x.toDouble() / placeSnapDistance) + 0.5) * placeSnapDistance).toInt(),
+            (floor((location.y.toDouble() / placeSnapDistance) + 0.5) * placeSnapDistance).toInt()
+        )
     }
 
     fun handleMousePress(mouseLocation: WorldLocation) {
@@ -129,15 +135,22 @@ class GameData(
     private fun handleInteractPress(mouseLocation: WorldLocation) {
         sl2ShouldChaseMouse = true
         showSelection = false
-        selectedNode = (getTopNodeAt(mouseLocation) ?: return) to null
+
+        val topNode = getTopNodeAt(mouseLocation)
+        if (topNode === null) {
+            selectedNode = null
+            return
+        }
+        selectedNode = topNode to null
     }
 
     private fun handleInteractRelease(mouseLocation: WorldLocation) {
         sl2ShouldChaseMouse = false
-        if (mouseLocation.distanceTo(selectionLocation1) >= 20.0) {
+        if (mouseLocation.distanceTo(selectionLocation1) >= 20.0 || interactionDrag) {
             placeNodeAtLocation(selectedNode?.first ?: return, mouseLocation)
             return
         }
+        interactionDrag = false
         val topNode = getTopNodeAt(mouseLocation)
         if (topNode === null) return
         runBlocking {
@@ -153,8 +166,8 @@ class GameData(
             sl2ShouldChaseMouse = true
             showSelection = true
             selectionLocation1 = topNode.location()
-            selectedNode = topNode to null as Node?
-        }
+            selectedNode = topNode to null
+        } else {selectedNode = null}
     }
 
     private fun handleConnectRelease(mouseLocation: WorldLocation) {

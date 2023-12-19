@@ -18,7 +18,7 @@ class AndGateHudElement : HudElement {
         if (window.data.currentPlaceType === NodeType.AndGate) {
             canvas.drawCircle(getButtonPoint(window), 35f, Colors.toolbarElementBorderSelected)
         }
-        Nodes.drawAndGate(getButtonPoint(window), false, 1.5f, canvas)
+        Nodes.drawAndGate(getButtonPoint(window), true, 1.5f, canvas)
     }
 
     override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {
