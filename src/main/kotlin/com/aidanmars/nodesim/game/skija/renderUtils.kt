@@ -39,7 +39,7 @@ fun angleBetweenPoints(point1: Point, point2: Point): Float {
 }
 
 fun Canvas.drawSvg(dom: SVGDOM, point: Point, size: Point) {
-    save()
+    val layer = save()
     translate(point.x, point.y)
     clipRect(Rect.makeXYWH(0f, 0f, size.x, size.y))
     dom.root!!.use {
@@ -48,9 +48,8 @@ fun Canvas.drawSvg(dom: SVGDOM, point: Point, size: Point) {
             .setPreserveAspectRatio(SVGPreserveAspectRatio())
     }
     dom.render(this)
-    restore()
-
     translate(0f, 0f)
+    restoreToCount(layer)
 }
 
 fun getSvgFromResource(resource: String): SVGDOM = SVGDOM(

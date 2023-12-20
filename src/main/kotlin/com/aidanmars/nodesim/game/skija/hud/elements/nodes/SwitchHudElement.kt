@@ -14,10 +14,11 @@ class SwitchHudElement : HudElement {
 
     override fun draw(window: NodeSimWindow, canvas: Canvas) {
         val point = getButtonPoint(window)
+        val (x, y) = point
         if (window.data.currentPlaceType === NodeType.Switch) {
             canvas.drawCircle(point, 35f, Colors.toolbarElementBorderSelected)
         }
-        canvas.drawSvg(SvgDoms.Nodes.switchOff, point, Point(60f, 60f))
+        canvas.drawSvg(SvgDoms.Nodes.switchOff, Point(x - 30f, y - 30f), Point(60f, 60f))
     }
 
     override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {

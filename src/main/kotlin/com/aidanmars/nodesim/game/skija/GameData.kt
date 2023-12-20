@@ -4,20 +4,19 @@ import com.aidanmars.nodesim.core.Circuit
 import com.aidanmars.nodesim.core.Node
 import com.aidanmars.nodesim.core.NodeType
 import com.aidanmars.nodesim.core.extensions.tick
-import com.aidanmars.nodesim.core.getChunk
+import com.aidanmars.nodesim.game.skija.hud.HudElementGroup
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 import kotlin.time.toDuration
-import kotlin.time.toJavaDuration
 
 class GameData(
     val setNodeElementsHidden: (hidden: Boolean) -> Unit,
-    val nodesOnScreen: Set<Node>
+    private val nodesOnScreen: MutableSet<Node>,
+    private val hudElements: HudElementGroup
 ) {
     var playerX = 0
     var playerY = 0
@@ -73,6 +72,7 @@ class GameData(
         isSimulating = false
     }
 
+    //<editor-fold desc="utility functions">
     fun getVirtualScreenLocation(worldLocation: WorldLocation): VirtualScreenLocation =
         VirtualScreenLocation((worldLocation.x - playerX) * scale, (worldLocation.y - playerY) * scale)
 
@@ -82,6 +82,91 @@ class GameData(
             ((virtualScreenLocation.y / scale) + playerY).toInt()
         )
 
+    private fun placeNodeAtLocation(node: Node, location: WorldLocation) {
+        val (x, y) = getNodePlaceLocation(location)
+        circuit.moveNode(node, x, y)
+        addNodeToDrawList(node)
+    }
+
+    private fun addNodeToDrawList(node: Node) = nodesOnScreen.add(node)
+
+    private fun getNodePlaceLocation(location: WorldLocation): WorldLocation {
+        if (placeSnapDistance == 1) return location
+        return WorldLocation(
+            (floor((location.x.toDouble() / placeSnapDistance) + 0.5) * placeSnapDistance).toInt(),
+            (floor((location.y.toDouble() / placeSnapDistance) + 0.5) * placeSnapDistance).toInt()
+        )
+    }
+
+    private fun getTopObjectAt(location: WorldLocation): Pair<Node, Node?>? {
+        val topNode = getTopNodeAt(location)
+        if (topNode !== null) return topNode to null
+        return getTopWireAt(location)
+    }
+
+    private fun getTopNodeAt(location: WorldLocation): Node? {
+        return nodesOnScreen.lastOrNull {
+            WorldLocation(it.x, it.y).distanceTo(location) < 20.0
+        }
+//        val (centerChunkX, centerChunkY) = getChunk(location.x, location.y)
+//        for (chunkX in ((centerChunkX - 1)..(centerChunkX + 1)).reversed()) {
+//            for (chunkY in ((centerChunkY - 1)..(centerChunkY + 1)).reversed()) {
+//                val chunk = circuit.chunks[chunkX, chunkY]
+//                if (chunk === null) continue
+//
+//                val node = chunk.lastOrNull { WorldLocation(it.x, it.y).distanceTo(location) < 20.0 }
+//                if (node === null) continue
+//                return node
+//            }
+//        }
+//        return null
+    }
+
+    private fun getTopWireAt(location: WorldLocation): Pair<Node, Node>? {
+        var topSelectedWire: Pair<Node, Node>? = null
+        nodesOnScreen.forEach { node ->
+            node.inputNodes.forEach { otherNode ->
+                if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
+                    topSelectedWire = otherNode to node
+                }
+            }
+            node.outputNodes.forEach { otherNode ->
+                if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
+                    topSelectedWire = node to otherNode
+                }
+            }
+        }
+        return topSelectedWire
+//        val topLeftLocation = topLeftScreenLocation()
+//        val bottomRightLocation = bottomRightScreenLocation()
+//        val (chunkXMin, chunkYMin) = getChunk(topLeftLocation.x, topLeftLocation.y)
+//        val (chunkXMax, chunkYMax) = getChunk(bottomRightLocation.x, bottomRightLocation.y)
+//        for (chunkX in (chunkXMin..chunkXMax).reversed()) {
+//            for (chunkY in (chunkYMin..chunkYMax).reversed()) {
+//                val chunk = circuit.chunks[chunkX, chunkY]
+//                if (chunk === null) continue
+//
+//                var topSelectedWire: Pair<Node, Node>? = null
+//                chunk.forEach {node ->
+//                    node.inputNodes.forEach { otherNode ->
+//                        if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
+//                            topSelectedWire = otherNode to node
+//                        }
+//                    }
+//                    node.outputNodes.forEach { otherNode ->
+//                        if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
+//                            topSelectedWire = node to otherNode
+//                        }
+//                    }
+//                }
+//                if (topSelectedWire !== null) return topSelectedWire
+//            }
+//        }
+//        return null
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="input handlers" defaultstate="collapsed">
     fun moveSl2InChase(newLocation: WorldLocation) {
         selectionLocation2 = newLocation
         when (currentTool) {
@@ -96,19 +181,6 @@ class GameData(
             }
             else -> {}
         }
-    }
-
-    fun placeNodeAtLocation(node: Node, location: WorldLocation) {
-        val (x, y) = getNodePlaceLocation(location)
-        circuit.moveNode(node, x, y)
-    }
-
-    fun getNodePlaceLocation(location: WorldLocation): WorldLocation {
-        if (placeSnapDistance == 1) return location
-        return WorldLocation(
-            (floor((location.x.toDouble() / placeSnapDistance) + 0.5) * placeSnapDistance).toInt(),
-            (floor((location.y.toDouble() / placeSnapDistance) + 0.5) * placeSnapDistance).toInt()
-        )
     }
 
     fun handleMousePress(mouseLocation: WorldLocation) {
@@ -199,6 +271,7 @@ class GameData(
             topObjectAtMouse === null -> {}
             topObjectAtMouse.second === null -> runBlocking {
                 circuitMutex.withLock {
+                    nodesOnScreen.remove(topObjectAtMouse.first)
                     circuit.deleteNode(topObjectAtMouse.first)
                 }
             }
@@ -216,7 +289,7 @@ class GameData(
         val nodeLocation = getNodePlaceLocation(mouseLocation)
         runBlocking {
             circuitMutex.withLock {
-                circuit.createNode(nodeLocation.x, nodeLocation.y, currentPlaceType)
+                addNodeToDrawList(circuit.createNode(nodeLocation.x, nodeLocation.y, currentPlaceType))
             }
         }
     }
@@ -230,71 +303,5 @@ class GameData(
     private fun handleSelectRelease(mouseLocation: WorldLocation) {
         selectionLocation2 = getNodePlaceLocation(mouseLocation)
     }
-
-    private fun getTopObjectAt(location: WorldLocation): Pair<Node, Node?>? {
-        val topNode = getTopNodeAt(location)
-        if (topNode !== null) return topNode to null
-        return getTopWireAt(location)
-    }
-
-    private fun getTopNodeAt(location: WorldLocation): Node? {
-        return nodesOnScreen.lastOrNull {
-            WorldLocation(it.x, it.y).distanceTo(location) < 20.0
-        }
-//        val (centerChunkX, centerChunkY) = getChunk(location.x, location.y)
-//        for (chunkX in ((centerChunkX - 1)..(centerChunkX + 1)).reversed()) {
-//            for (chunkY in ((centerChunkY - 1)..(centerChunkY + 1)).reversed()) {
-//                val chunk = circuit.chunks[chunkX, chunkY]
-//                if (chunk === null) continue
-//
-//                val node = chunk.lastOrNull { WorldLocation(it.x, it.y).distanceTo(location) < 20.0 }
-//                if (node === null) continue
-//                return node
-//            }
-//        }
-//        return null
-    }
-
-    private fun getTopWireAt(location: WorldLocation): Pair<Node, Node>? {
-        var topSelectedWire: Pair<Node, Node>? = null
-        nodesOnScreen.forEach { node ->
-            node.inputNodes.forEach { otherNode ->
-                if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
-                    topSelectedWire = otherNode to node
-                }
-            }
-            node.outputNodes.forEach { otherNode ->
-                if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
-                    topSelectedWire = node to otherNode
-                }
-            }
-        }
-        return topSelectedWire
-//        val topLeftLocation = topLeftScreenLocation()
-//        val bottomRightLocation = bottomRightScreenLocation()
-//        val (chunkXMin, chunkYMin) = getChunk(topLeftLocation.x, topLeftLocation.y)
-//        val (chunkXMax, chunkYMax) = getChunk(bottomRightLocation.x, bottomRightLocation.y)
-//        for (chunkX in (chunkXMin..chunkXMax).reversed()) {
-//            for (chunkY in (chunkYMin..chunkYMax).reversed()) {
-//                val chunk = circuit.chunks[chunkX, chunkY]
-//                if (chunk === null) continue
-//
-//                var topSelectedWire: Pair<Node, Node>? = null
-//                chunk.forEach {node ->
-//                    node.inputNodes.forEach { otherNode ->
-//                        if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
-//                            topSelectedWire = otherNode to node
-//                        }
-//                    }
-//                    node.outputNodes.forEach { otherNode ->
-//                        if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
-//                            topSelectedWire = node to otherNode
-//                        }
-//                    }
-//                }
-//                if (topSelectedWire !== null) return topSelectedWire
-//            }
-//        }
-//        return null
-    }
+    //</editor-fold>
 }

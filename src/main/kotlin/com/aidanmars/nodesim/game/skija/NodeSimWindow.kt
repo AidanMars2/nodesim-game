@@ -2,10 +2,10 @@ package com.aidanmars.nodesim.game.skija
 
 import com.aidanmars.nodesim.core.Node
 import com.aidanmars.nodesim.core.NodeType
-import com.aidanmars.nodesim.core.getChunk
 import com.aidanmars.nodesim.game.skija.constants.Colors
 import com.aidanmars.nodesim.game.skija.constants.Constants.SIZE_CHUNK
 import com.aidanmars.nodesim.game.skija.constants.Constants.SIZE_TILE
+import com.aidanmars.nodesim.game.skija.constants.SvgDoms
 import com.aidanmars.nodesim.game.skija.hud.HudElement
 import com.aidanmars.nodesim.game.skija.hud.HudElementGroup
 import com.aidanmars.nodesim.game.skija.world.drawNode
@@ -24,12 +24,13 @@ import kotlin.math.*
 //TODO: undo/redo
 class NodeSimWindow : Window("NodeSim") {
     private val hudElements = mutableListOf<HudElement>() // elements later in the list have priority
-    val hudElementGroup = HudElementGroup()
+    private val hudElementGroup = HudElementGroup()
     private var lastDrawCallDate = 0L
     private val nodesOnScreen = mutableSetOf<Node>()
     val data = GameData(
         ::setBuildTypesHidden,
-        nodesOnScreen
+        nodesOnScreen,
+        hudElementGroup
     )
     private var oldTopLeftChunk = topLeftScreenLocation().chunk()
     private var oldBottomRightChunk = bottomRightScreenLocation().chunk()
@@ -38,12 +39,12 @@ class NodeSimWindow : Window("NodeSim") {
         GLFWErrorCallback.createPrint(System.err).set()
         check(glfwInit()) { "Unable to initialize GLFW" }
 
-        val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor())
-        val width = (vidmode!!.width() * 0.75).toInt()
-        val height = (vidmode.height() * 0.75).toInt()
+        val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
+        val width = (videoMode!!.width() * 0.75).toInt()
+        val height = (videoMode.height() * 0.75).toInt()
         val bounds = IRect.makeXYWH(
-            max(0, (vidmode.width() - width) / 2),
-            max(0, (vidmode.height() - height) / 2),
+            max(0, (videoMode.width() - width) / 2),
+            max(0, (videoMode.height() - height) / 2),
             width,
             height
         )
@@ -71,30 +72,23 @@ class NodeSimWindow : Window("NodeSim") {
         getVirtualScreenLocation(width.toFloat(), height.toFloat())
     )
 
-    private fun setOldScreenLocations() {
-        oldTopLeftChunk = topLeftScreenLocation().chunk()
-        oldBottomRightChunk = bottomRightScreenLocation().chunk()
-    }
-
     private fun setNodesOnScreen() {
-        if (topLeftScreenLocation().chunk() == oldTopLeftChunk ||
-            bottomRightScreenLocation().chunk() == oldBottomRightChunk) return
+        val topLeftChunk = topLeftScreenLocation().chunk()
+        val bottomRightChunk = bottomRightScreenLocation().chunk()
+        if (topLeftChunk == oldTopLeftChunk ||
+            bottomRightChunk == oldBottomRightChunk) return
         nodesOnScreen.clear()
 
-        val topLeftWorldLocation = topLeftScreenLocation()
-        val bottomRightWorldLocation = bottomRightScreenLocation()
-
-        val topLeftChunk = getChunk(topLeftWorldLocation.x, topLeftWorldLocation.y)
-        val bottomRightChunk = getChunk(bottomRightWorldLocation.x, bottomRightWorldLocation.y)
-
-        for (chunkX in topLeftChunk.first..bottomRightChunk.first) {
-            for (chunkY in topLeftChunk.second..bottomRightChunk.second) {
+        for (chunkX in topLeftChunk.x..bottomRightChunk.x) {
+            for (chunkY in topLeftChunk.y..bottomRightChunk.y) {
                 val chunk = data.circuit.chunks[chunkX, chunkY]
                 if (chunk === null) continue
 
                 nodesOnScreen.addAll(chunk)
             }
         }
+        oldTopLeftChunk = topLeftChunk
+        oldBottomRightChunk = bottomRightChunk
     }
     //</editor-fold>
 
@@ -153,7 +147,6 @@ class NodeSimWindow : Window("NodeSim") {
     }
 
     override fun onScroll(window: Long, xOffset: Double, yOffset: Double) {
-        setOldScreenLocations()
         val scaleDifference = 1.1.pow(yOffset)
         data.scale *= scaleDifference.toFloat()
         data.scale = data.scale.coerceAtMost(10f)
@@ -216,8 +209,6 @@ class NodeSimWindow : Window("NodeSim") {
     //</editor-fold>
 
     private fun doGameUpdate() {
-        setOldScreenLocations()
-
         val currentTime = System.currentTimeMillis()
         val multiplier = (currentTime - lastDrawCallDate).toFloat()
         lastDrawCallDate = currentTime
@@ -401,8 +392,24 @@ class NodeSimWindow : Window("NodeSim") {
         if (!data.sl2ShouldChaseMouse) {
             val topLeftX = min(data.selectionLocation1.x, data.selectionLocation2.x)
             val topLeftY = min(data.selectionLocation1.y, data.selectionLocation2.y)
-            val drawOriginX = topLeftX - 25f
+            val drawOriginX = topLeftX - 35f
             val drawOriginY = topLeftY.toFloat()
+            canvas.drawSvg(
+                SvgDoms.Hud.Selection.copyOption,
+                Point(drawOriginX, drawOriginY), Point(30f, 30f)
+            )
+            canvas.drawSvg(
+                SvgDoms.Hud.Selection.moveOption,
+                Point(drawOriginX, drawOriginY + 70f), Point(30f, 30f)
+            )
+            canvas.drawSvg(
+                SvgDoms.Hud.Selection.deleteOption,
+                Point(drawOriginX, drawOriginY + 140f), Point(30f, 30f)
+            )
+            canvas.drawSvg(
+                SvgDoms.Hud.Selection.packageOption,
+                Point(drawOriginX, drawOriginY + 210f), Point(30f, 30f)
+            )
         }
     }
     //</editor-fold>

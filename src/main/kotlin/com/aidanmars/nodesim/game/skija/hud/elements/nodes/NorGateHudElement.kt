@@ -14,10 +14,11 @@ class NorGateHudElement : HudElement {
 
     override fun draw(window: NodeSimWindow, canvas: Canvas) {
         val point = getButtonPoint(window)
+        val (x, y) = point
         if (window.data.currentPlaceType === NodeType.NorGate) {
             canvas.drawCircle(point, 35f, Colors.toolbarElementBorderSelected)
         }
-        canvas.drawSvg(SvgDoms.Nodes.norGateOn, point, Point(60f, 60f))
+        canvas.drawSvg(SvgDoms.Nodes.norGateOn, Point(x - 40.5f, y - 40.5f), Point(81f, 81f))
     }
 
     override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {

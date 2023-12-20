@@ -5,14 +5,20 @@ import io.github.humbleui.skija.Canvas
 import io.github.humbleui.types.Point
 
 interface HudElement {
+    /**
+     * true if this element should not be drawn
+     */
     var isHidden: Boolean
 
+    /**
+     * true if this element wants to get key events
+     */
     var isFocused: Boolean
 
     fun draw(window: NodeSimWindow, canvas: Canvas)
 
     /**
-     * @return true if the event should not be passed on to another element
+     * @return false if the event should be passed to another element
      */
     fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean
 
