@@ -1,4 +1,4 @@
-package com.aidanmars.nodesim.game.skija
+package com.aidanmars.nodesim.game.skija.constants
 
 object Constants {
     const val SIZE_TILE = 40

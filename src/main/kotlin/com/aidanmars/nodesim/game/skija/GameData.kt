@@ -16,9 +16,8 @@ import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 
 class GameData(
-    val topLeftScreenLocation: () -> WorldLocation,
-    val bottomRightScreenLocation: () -> WorldLocation,
-    val setNodeElementsHidden: (hidden: Boolean) -> Unit
+    val setNodeElementsHidden: (hidden: Boolean) -> Unit,
+    val nodesOnScreen: Set<Node>
 ) {
     var playerX = 0
     var playerY = 0
@@ -92,6 +91,9 @@ class GameData(
                     interactionDrag = true
                 }
             }
+            ToolType.Select -> {
+                selectionLocation2 = getNodePlaceLocation(newLocation)
+            }
             else -> {}
         }
     }
@@ -110,6 +112,9 @@ class GameData(
     }
 
     fun handleMousePress(mouseLocation: WorldLocation) {
+        sl2ShouldChaseMouse = false
+        showSelection = false
+        selectedNode = null
         isHolding = true
         selectionLocation1 = mouseLocation
         when (currentTool) {
@@ -117,6 +122,7 @@ class GameData(
             ToolType.Delete -> handleDeletePress(mouseLocation)
             ToolType.Interact -> handleInteractPress(mouseLocation)
             ToolType.Connect -> handleConnectPress(mouseLocation)
+            ToolType.Select -> handleSelectPress(mouseLocation)
         }
     }
 
@@ -124,17 +130,18 @@ class GameData(
         if (!isHolding) return
         isHolding = false
 
+        sl2ShouldChaseMouse = false
         when (currentTool) {
             ToolType.Place -> handlePlaceRelease(mouseLocation)
             ToolType.Delete -> handleDeleteRelease(mouseLocation)
             ToolType.Interact -> handleInteractRelease(mouseLocation)
             ToolType.Connect -> handleConnectRelease(mouseLocation)
+            ToolType.Select -> handleSelectRelease(mouseLocation)
         }
     }
 
     private fun handleInteractPress(mouseLocation: WorldLocation) {
         sl2ShouldChaseMouse = true
-        showSelection = false
 
         val topNode = getTopNodeAt(mouseLocation)
         if (topNode === null) {
@@ -145,7 +152,6 @@ class GameData(
     }
 
     private fun handleInteractRelease(mouseLocation: WorldLocation) {
-        sl2ShouldChaseMouse = false
         if (mouseLocation.distanceTo(selectionLocation1) >= 20.0 || interactionDrag) {
             placeNodeAtLocation(selectedNode?.first ?: return, mouseLocation)
             return
@@ -171,8 +177,6 @@ class GameData(
     }
 
     private fun handleConnectRelease(mouseLocation: WorldLocation) {
-        sl2ShouldChaseMouse = false
-        showSelection = false
         val secondNode = getTopNodeAt(mouseLocation)
         if (secondNode === null) return
         if (selectedNode === null) return
@@ -190,8 +194,6 @@ class GameData(
     }
 
     private fun handleDeleteRelease(mouseLocation: WorldLocation) {
-        sl2ShouldChaseMouse = false
-        showSelection = false // change later
         val topObjectAtMouse = getTopObjectAt(mouseLocation)
         when {
             topObjectAtMouse === null -> {}
@@ -208,10 +210,7 @@ class GameData(
         }
     }
 
-    private fun handlePlacePress(mouseLocation: WorldLocation) {
-        sl2ShouldChaseMouse = false
-        showSelection = false
-    }
+    private fun handlePlacePress(mouseLocation: WorldLocation) {}
 
     private fun handlePlaceRelease(mouseLocation: WorldLocation) {
         val nodeLocation = getNodePlaceLocation(mouseLocation)
@@ -220,7 +219,16 @@ class GameData(
                 circuit.createNode(nodeLocation.x, nodeLocation.y, currentPlaceType)
             }
         }
-        sl2ShouldChaseMouse = false
+    }
+
+    private fun handleSelectPress(mouseLocation: WorldLocation) {
+        selectionLocation1 = getNodePlaceLocation(mouseLocation)
+        sl2ShouldChaseMouse = true
+        showSelection = true
+    }
+
+    private fun handleSelectRelease(mouseLocation: WorldLocation) {
+        selectionLocation2 = getNodePlaceLocation(mouseLocation)
     }
 
     private fun getTopObjectAt(location: WorldLocation): Pair<Node, Node?>? {
@@ -230,46 +238,63 @@ class GameData(
     }
 
     private fun getTopNodeAt(location: WorldLocation): Node? {
-        val (centerChunkX, centerChunkY) = getChunk(location.x, location.y)
-        for (chunkX in ((centerChunkX - 1)..(centerChunkX + 1)).reversed()) {
-            for (chunkY in ((centerChunkY - 1)..(centerChunkY + 1)).reversed()) {
-                val chunk = circuit.chunks[chunkX, chunkY]
-                if (chunk === null) continue
-
-                val node = chunk.lastOrNull { WorldLocation(it.x, it.y).distanceTo(location) < 25.0 }
-                if (node === null) continue
-                return node
-            }
+        return nodesOnScreen.lastOrNull {
+            WorldLocation(it.x, it.y).distanceTo(location) < 20.0
         }
-        return null
+//        val (centerChunkX, centerChunkY) = getChunk(location.x, location.y)
+//        for (chunkX in ((centerChunkX - 1)..(centerChunkX + 1)).reversed()) {
+//            for (chunkY in ((centerChunkY - 1)..(centerChunkY + 1)).reversed()) {
+//                val chunk = circuit.chunks[chunkX, chunkY]
+//                if (chunk === null) continue
+//
+//                val node = chunk.lastOrNull { WorldLocation(it.x, it.y).distanceTo(location) < 20.0 }
+//                if (node === null) continue
+//                return node
+//            }
+//        }
+//        return null
     }
 
     private fun getTopWireAt(location: WorldLocation): Pair<Node, Node>? {
-        val topLeftLocation = topLeftScreenLocation()
-        val bottomRightLocation = bottomRightScreenLocation()
-        val (chunkXMin, chunkYMin) = getChunk(topLeftLocation.x, topLeftLocation.y)
-        val (chunkXMax, chunkYMax) = getChunk(bottomRightLocation.x, bottomRightLocation.y)
-        for (chunkX in (chunkXMin..chunkXMax).reversed()) {
-            for (chunkY in (chunkYMin..chunkYMax).reversed()) {
-                val chunk = circuit.chunks[chunkX, chunkY]
-                if (chunk === null) continue
-
-                var topSelectedWire: Pair<Node, Node>? = null
-                chunk.forEach {node ->
-                    node.inputNodes.forEach { otherNode ->
-                        if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
-                            topSelectedWire = otherNode to node
-                        }
-                    }
-                    node.outputNodes.forEach { otherNode ->
-                        if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
-                            topSelectedWire = node to otherNode
-                        }
-                    }
+        var topSelectedWire: Pair<Node, Node>? = null
+        nodesOnScreen.forEach { node ->
+            node.inputNodes.forEach { otherNode ->
+                if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
+                    topSelectedWire = otherNode to node
                 }
-                if (topSelectedWire !== null) return topSelectedWire
+            }
+            node.outputNodes.forEach { otherNode ->
+                if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
+                    topSelectedWire = node to otherNode
+                }
             }
         }
-        return null
+        return topSelectedWire
+//        val topLeftLocation = topLeftScreenLocation()
+//        val bottomRightLocation = bottomRightScreenLocation()
+//        val (chunkXMin, chunkYMin) = getChunk(topLeftLocation.x, topLeftLocation.y)
+//        val (chunkXMax, chunkYMax) = getChunk(bottomRightLocation.x, bottomRightLocation.y)
+//        for (chunkX in (chunkXMin..chunkXMax).reversed()) {
+//            for (chunkY in (chunkYMin..chunkYMax).reversed()) {
+//                val chunk = circuit.chunks[chunkX, chunkY]
+//                if (chunk === null) continue
+//
+//                var topSelectedWire: Pair<Node, Node>? = null
+//                chunk.forEach {node ->
+//                    node.inputNodes.forEach { otherNode ->
+//                        if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
+//                            topSelectedWire = otherNode to node
+//                        }
+//                    }
+//                    node.outputNodes.forEach { otherNode ->
+//                        if (distanceToLine(location, otherNode.location(), node.location()) < 5f) {
+//                            topSelectedWire = node to otherNode
+//                        }
+//                    }
+//                }
+//                if (topSelectedWire !== null) return topSelectedWire
+//            }
+//        }
+//        return null
     }
 }

@@ -1,6 +1,6 @@
 package com.aidanmars.nodesim.game.skija.world
 
-import com.aidanmars.nodesim.game.skija.Colors
+import com.aidanmars.nodesim.game.skija.constants.Colors
 import com.aidanmars.nodesim.game.skija.angleBetweenPoints
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.Paint

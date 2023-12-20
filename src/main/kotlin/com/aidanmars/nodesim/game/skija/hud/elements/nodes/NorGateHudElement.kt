@@ -1,12 +1,10 @@
 package com.aidanmars.nodesim.game.skija.hud.elements.nodes
 
 import com.aidanmars.nodesim.core.NodeType
-import com.aidanmars.nodesim.game.skija.Colors
-import com.aidanmars.nodesim.game.skija.NodeSimWindow
-import com.aidanmars.nodesim.game.skija.distance
-import com.aidanmars.nodesim.game.skija.drawCircle
+import com.aidanmars.nodesim.game.skija.*
+import com.aidanmars.nodesim.game.skija.constants.Colors
+import com.aidanmars.nodesim.game.skija.constants.SvgDoms
 import com.aidanmars.nodesim.game.skija.hud.HudElement
-import com.aidanmars.nodesim.game.skija.world.Nodes
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.types.Point
 
@@ -15,10 +13,11 @@ class NorGateHudElement : HudElement {
     override var isFocused: Boolean = false
 
     override fun draw(window: NodeSimWindow, canvas: Canvas) {
+        val point = getButtonPoint(window)
         if (window.data.currentPlaceType === NodeType.NorGate) {
-            canvas.drawCircle(getButtonPoint(window), 35f, Colors.toolbarElementBorderSelected)
+            canvas.drawCircle(point, 35f, Colors.toolbarElementBorderSelected)
         }
-        Nodes.drawNorGate(getButtonPoint(window), true, 1.5f, canvas)
+        canvas.drawSvg(SvgDoms.Nodes.norGateOn, point, Point(60f, 60f))
     }
 
     override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {

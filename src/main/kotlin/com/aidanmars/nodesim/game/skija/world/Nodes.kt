@@ -1,17 +1,10 @@
 package com.aidanmars.nodesim.game.skija.world
 
-import com.aidanmars.nodesim.game.skija.Colors
 import com.aidanmars.nodesim.game.skija.*
 import io.github.humbleui.skija.Canvas
-import io.github.humbleui.skija.Color
 import io.github.humbleui.skija.Data
-import io.github.humbleui.skija.Paint
-import io.github.humbleui.skija.PaintStrokeCap
 import io.github.humbleui.skija.svg.SVGDOM
-import io.github.humbleui.skija.svg.SVGLength
-import io.github.humbleui.skija.svg.SVGPreserveAspectRatio
 import io.github.humbleui.types.Point
-import io.github.humbleui.types.Rect
 
 object Nodes {
     private val switchOffDom = SVGDOM(Data.makeFromBytes(
@@ -44,41 +37,41 @@ object Nodes {
     private val xorGateOnDom = SVGDOM(Data.makeFromBytes(
         Thread.currentThread().contextClassLoader.getResource("nodes/xorGate-on.svg")!!.readBytes())
     )
-    private const val NodeGlowRadius = 27f
-    private const val NodeEdge1Radius = 20f
-    private const val NodeStructure1Radius = 18f
-    private const val NodeEdge2Radius = 15f
-    private const val NodeStructure2Radius = 13f
-    private const val NodeEdge3Radius = 10f
-    private const val NodeStructure3Radius = 8f
-    private const val Sin45Degrees = 0.707106781f
-    private const val XorLineOffSet = Sin45Degrees * NodeEdge2Radius + 0.05f
-    private const val XorLineWidth = NodeStructure2Radius * 0.3f
-    private const val XorLineEdgeWidth = XorLineWidth + 3f
+//    private const val NodeGlowRadius = 27f
+//    private const val NodeEdge1Radius = 20f
+//    private const val NodeStructure1Radius = 18f
+//    private const val NodeEdge2Radius = 15f
+//    private const val NodeStructure2Radius = 13f
+//    private const val NodeEdge3Radius = 10f
+//    private const val NodeStructure3Radius = 8f
+//    private const val Sin45Degrees = 0.707106781f
+//    private const val XorLineOffSet = Sin45Degrees * NodeEdge2Radius + 0.05f
+//    private const val XorLineWidth = NodeStructure2Radius * 0.3f
+//    private const val XorLineEdgeWidth = XorLineWidth + 3f
 
-    private fun drawNodeBase(center: Point, scale: Float, canvas: Canvas) {
-        canvas.drawCircle(center, NodeEdge1Radius * scale, Colors.nodeEdge)
-        canvas.drawCircle(center, NodeStructure1Radius * scale, Colors.nodeStructure)
-    }
-
-    private fun drawNodeBase2(center: Point, scale: Float, canvas: Canvas) {
-        canvas.drawCircle(center, NodeEdge2Radius * scale, Colors.nodeEdge)
-        canvas.drawCircle(center, NodeStructure2Radius * scale, Colors.nodeStructure)
-    }
-
-    private fun drawNodeBase3(center: Point, scale: Float, canvas: Canvas) {
-        canvas.drawCircle(center, NodeEdge3Radius * scale, Colors.nodeEdge)
-        canvas.drawCircle(center, NodeStructure3Radius * scale, Colors.nodeStructure)
-    }
-
-    private fun drawNodeGlow(
-        shouldDraw: Boolean, center: Point,
-        scale: Float, canvas: Canvas,
-        innerColor: Int, outerColor: Int,) {
-        if (shouldDraw) {
-            canvas.drawCircle(center, NodeGlowRadius * scale, innerColor, outerColor)
-        }
-    }
+//    private fun drawNodeBase(center: Point, scale: Float, canvas: Canvas) {
+//        canvas.drawCircle(center, NodeEdge1Radius * scale, Colors.nodeEdge)
+//        canvas.drawCircle(center, NodeStructure1Radius * scale, Colors.nodeStructure)
+//    }
+//
+//    private fun drawNodeBase2(center: Point, scale: Float, canvas: Canvas) {
+//        canvas.drawCircle(center, NodeEdge2Radius * scale, Colors.nodeEdge)
+//        canvas.drawCircle(center, NodeStructure2Radius * scale, Colors.nodeStructure)
+//    }
+//
+//    private fun drawNodeBase3(center: Point, scale: Float, canvas: Canvas) {
+//        canvas.drawCircle(center, NodeEdge3Radius * scale, Colors.nodeEdge)
+//        canvas.drawCircle(center, NodeStructure3Radius * scale, Colors.nodeStructure)
+//    }
+//
+//    private fun drawNodeGlow(
+//        shouldDraw: Boolean, center: Point,
+//        scale: Float, canvas: Canvas,
+//        innerColor: Int, outerColor: Int,) {
+//        if (shouldDraw) {
+//            canvas.drawCircle(center, NodeGlowRadius * scale, innerColor, outerColor)
+//        }
+//    }
 
     private fun drawNode(
         center: Point, power: Boolean,

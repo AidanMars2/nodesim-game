@@ -1,19 +1,15 @@
 package com.aidanmars.nodesim.game.skija.hud.elements
 
-import com.aidanmars.nodesim.game.skija.Colors
+import com.aidanmars.nodesim.game.skija.constants.Colors
 import com.aidanmars.nodesim.game.skija.NodeSimWindow
 import com.aidanmars.nodesim.game.skija.ToolType
 import com.aidanmars.nodesim.game.skija.*
+import com.aidanmars.nodesim.game.skija.constants.SvgDoms
 import com.aidanmars.nodesim.game.skija.hud.HudElement
 import io.github.humbleui.skija.Canvas
-import io.github.humbleui.skija.Paint
-import io.github.humbleui.skija.PaintStrokeCap
 import io.github.humbleui.types.Point
 
 class PlaceHudElement : HudElement {
-    private companion object {
-        val elementDom = getSvgFromResource("hud/placeElement.svg")
-    }
     override var isHidden: Boolean = false
     override var isFocused: Boolean = false
 
@@ -23,7 +19,7 @@ class PlaceHudElement : HudElement {
         if (window.data.currentTool == ToolType.Place) {
             canvas.drawCircle(point, 40f, Colors.toolbarElementBorderSelected)
         }
-        canvas.drawSvg(elementDom, Point(x - 35f, y - 35f), Point(70f, 70f))
+        canvas.drawSvg(SvgDoms.Hud.placeElement, Point(x - 35f, y - 35f), Point(70f, 70f))
 //        canvas.drawCircle(point, 35f, Colors.placeElementBorder)
 //        canvas.drawCircle(point, 30f, Colors.placeElementMain)
 //

@@ -1,14 +1,13 @@
 package com.aidanmars.nodesim.game.skija.hud.elements
 
 import com.aidanmars.nodesim.game.skija.*
+import com.aidanmars.nodesim.game.skija.constants.Colors
+import com.aidanmars.nodesim.game.skija.constants.SvgDoms
 import com.aidanmars.nodesim.game.skija.hud.HudElement
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.types.Point
 
 class ConnectHudElement : HudElement {
-    private companion object {
-        val elementDom = getSvgFromResource("hud/connectElement.svg")
-    }
     override var isHidden: Boolean = false
     override var isFocused: Boolean = false
 
@@ -18,7 +17,7 @@ class ConnectHudElement : HudElement {
         if (window.data.currentTool == ToolType.Connect) {
             canvas.drawCircle(point, 40f, Colors.toolbarElementBorderSelected)
         }
-        canvas.drawSvg(elementDom, Point(x - 35f, y - 35f), Point(70f, 70f))
+        canvas.drawSvg(SvgDoms.Hud.connectElement, Point(x - 35f, y - 35f), Point(70f, 70f))
 //        canvas.drawCircle(point, 35f, Colors.connectElementBorder)
 //        canvas.drawCircle(point, 30f, Colors.connectElementMain)
 //

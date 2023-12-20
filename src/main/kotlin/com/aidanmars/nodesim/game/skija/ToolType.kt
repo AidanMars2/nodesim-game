@@ -4,5 +4,6 @@ enum class ToolType {
     Place,
     Delete,
     Interact,
-    Connect
+    Connect,
+    Select
 }

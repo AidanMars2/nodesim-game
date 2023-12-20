@@ -1,6 +1,5 @@
-package com.aidanmars.nodesim.game.skija.hud.elements.nodes
+package com.aidanmars.nodesim.game.skija.hud.elements
 
-import com.aidanmars.nodesim.core.NodeType
 import com.aidanmars.nodesim.game.skija.*
 import com.aidanmars.nodesim.game.skija.constants.Colors
 import com.aidanmars.nodesim.game.skija.constants.SvgDoms
@@ -8,30 +7,31 @@ import com.aidanmars.nodesim.game.skija.hud.HudElement
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.types.Point
 
-class XorGateHudElement : HudElement {
+class SelectHudElement : HudElement {
     override var isHidden: Boolean = false
     override var isFocused: Boolean = false
 
     override fun draw(window: NodeSimWindow, canvas: Canvas) {
         val point = getButtonPoint(window)
-        if (window.data.currentPlaceType === NodeType.XorGate) {
-            canvas.drawCircle(point, 35f, Colors.toolbarElementBorderSelected)
+        val (x, y) = point
+        if (window.data.currentTool == ToolType.Select) {
+            canvas.drawCircle(point, 40f, Colors.toolbarElementBorderSelected)
         }
-        canvas.drawSvg(SvgDoms.Nodes.xorGateOff, point, Point(60f, 60f))
+        canvas.drawSvg(SvgDoms.Hud.selectElement, Point(x - 35f, y - 35f), Point(70f, 70f))
     }
 
     override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {
-        if (getButtonPoint(window).distance(mouseLocation) > 30f) return false
-        window.data.currentPlaceType = NodeType.XorGate
+        if (mouseLocation.distance(getButtonPoint(window)) > 35f) return false
+        window.data.currentTool = ToolType.Select
         return true
-    }
-
-    private fun getButtonPoint(window: NodeSimWindow): Point {
-        return Point(380f, window.height - 140f)
     }
 
     override fun onKeyEvent(window: NodeSimWindow, key: Int, mods: Int): Boolean {
         isFocused = false
         return false
+    }
+
+    private fun getButtonPoint(window: NodeSimWindow): Point {
+        return Point(380f, window.height - 60f)
     }
 }

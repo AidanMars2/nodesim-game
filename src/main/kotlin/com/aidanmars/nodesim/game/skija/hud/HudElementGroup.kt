@@ -14,7 +14,8 @@ data class HudElementGroup(
     val norGateElement: HudElement = NorGateHudElement(),
     val andGateElement: HudElement = AndGateHudElement(),
     val xorGateElement: HudElement = XorGateHudElement(),
-    val snapElement: HudElement = SnapHudElement()
+    val snapElement: HudElement = SnapHudElement(),
+    val selectElement: HudElement = SelectHudElement()
 ) {
     fun addAllToList(list: MutableList<HudElement>) {
         list.add(placeElement)
@@ -28,5 +29,6 @@ data class HudElementGroup(
         list.add(andGateElement)
         list.add(xorGateElement)
         list.add(snapElement)
+        list.add(selectElement)
     }
 }
