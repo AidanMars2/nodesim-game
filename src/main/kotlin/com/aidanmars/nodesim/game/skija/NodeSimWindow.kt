@@ -24,7 +24,7 @@ import kotlin.math.*
 //TODO: undo/redo
 class NodeSimWindow : Window("NodeSim") {
     private val hudElements = mutableListOf<HudElement>() // elements later in the list have priority
-    private val hudElementGroup = HudElementGroup()
+    val hudElementGroup = HudElementGroup()
     private var lastDrawCallDate = 0L
     private val nodesOnScreen = mutableSetOf<Node>()
     val data = GameData(
@@ -356,6 +356,7 @@ class NodeSimWindow : Window("NodeSim") {
     }
 
     private fun drawSelection(canvas: Canvas) {
+        hudElementGroup.selectionElement.isHidden = !data.showSelection || data.sl2ShouldChaseMouse
         if (!data.showSelection) return
         when (data.currentTool) {
             ToolType.Place -> {}
@@ -389,28 +390,29 @@ class NodeSimWindow : Window("NodeSim") {
             canvas.drawLine(sx1, sy2, sx2, sy2, it)
             canvas.drawLine(sx2, sy1, sx2, sy2, it)
         }
-        if (!data.sl2ShouldChaseMouse) {
-            val topLeftX = min(data.selectionLocation1.x, data.selectionLocation2.x)
-            val topLeftY = min(data.selectionLocation1.y, data.selectionLocation2.y)
-            val drawOriginX = topLeftX - 35f
-            val drawOriginY = topLeftY.toFloat()
-            canvas.drawSvg(
-                SvgDoms.Hud.Selection.copyOption,
-                Point(drawOriginX, drawOriginY), Point(30f, 30f)
-            )
-            canvas.drawSvg(
-                SvgDoms.Hud.Selection.moveOption,
-                Point(drawOriginX, drawOriginY + 70f), Point(30f, 30f)
-            )
-            canvas.drawSvg(
-                SvgDoms.Hud.Selection.deleteOption,
-                Point(drawOriginX, drawOriginY + 140f), Point(30f, 30f)
-            )
-            canvas.drawSvg(
-                SvgDoms.Hud.Selection.packageOption,
-                Point(drawOriginX, drawOriginY + 210f), Point(30f, 30f)
-            )
-        }
+        // moved to SelectionElement.kt
+//        if (!data.sl2ShouldChaseMouse) {
+//            val topLeftX = min(data.selectionLocation1.x, data.selectionLocation2.x)
+//            val topLeftY = min(data.selectionLocation1.y, data.selectionLocation2.y)
+//            val drawOriginX = topLeftX - 35f
+//            val drawOriginY = topLeftY.toFloat()
+//            canvas.drawSvg(
+//                SvgDoms.Hud.Selection.copyOption,
+//                Point(drawOriginX, drawOriginY), Point(30f, 30f)
+//            )
+//            canvas.drawSvg(
+//                SvgDoms.Hud.Selection.moveOption,
+//                Point(drawOriginX, drawOriginY + 70f), Point(30f, 30f)
+//            )
+//            canvas.drawSvg(
+//                SvgDoms.Hud.Selection.deleteOption,
+//                Point(drawOriginX, drawOriginY + 140f), Point(30f, 30f)
+//            )
+//            canvas.drawSvg(
+//                SvgDoms.Hud.Selection.packageOption,
+//                Point(drawOriginX, drawOriginY + 210f), Point(30f, 30f)
+//            )
+//        }
     }
     //</editor-fold>
 }

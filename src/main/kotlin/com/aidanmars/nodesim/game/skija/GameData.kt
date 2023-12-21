@@ -40,10 +40,17 @@ class GameData(
             field = value
             setNodeElementsHidden(value != ToolType.Place)
         }
-    private val circuitMutex = Mutex()
+    val circuitMutex = Mutex()
     private var isSimulating = false
     var placeSnapDistance = 1
     private var interactionDrag = false
+
+    var clipBoard = Circuit()
+    var showClipboard = false
+    var clipBoardLocation = WorldLocation(0, 0)
+
+    var movingNodes = setOf<Node>()
+    var clickedMoveSelection = false
 
     fun startSimulation() {
         if (isSimulating) return
@@ -72,7 +79,7 @@ class GameData(
         isSimulating = false
     }
 
-    //<editor-fold desc="utility functions">
+    //<editor-fold desc="utility functions" defaultstate="collapsed">
     fun getVirtualScreenLocation(worldLocation: WorldLocation): VirtualScreenLocation =
         VirtualScreenLocation((worldLocation.x - playerX) * scale, (worldLocation.y - playerY) * scale)
 
@@ -177,7 +184,21 @@ class GameData(
                 }
             }
             ToolType.Select -> {
-                selectionLocation2 = getNodePlaceLocation(newLocation)
+                if (clickedMoveSelection) {
+                    val oldSelectionLocation = selectionLocation2
+                    selectionLocation2 = getNodePlaceLocation(newLocation)
+                    val xOffset = selectionLocation2.x - oldSelectionLocation.x
+                    val yOffset = selectionLocation2.y - oldSelectionLocation.y
+                    runBlocking {
+                        circuitMutex.withLock {
+                            movingNodes.forEach {
+                                circuit.moveNode(it, it.x + xOffset, it.y + yOffset)
+                            }
+                        }
+                    }
+                } else {
+                    selectionLocation2 = getNodePlaceLocation(newLocation)
+                }
             }
             else -> {}
         }
@@ -295,6 +316,11 @@ class GameData(
     }
 
     private fun handleSelectPress(mouseLocation: WorldLocation) {
+        if (clickedMoveSelection) {
+            showSelection = false
+            sl2ShouldChaseMouse = true
+            return
+        }
         selectionLocation1 = getNodePlaceLocation(mouseLocation)
         sl2ShouldChaseMouse = true
         showSelection = true

@@ -3,21 +3,29 @@ package com.aidanmars.nodesim.game.skija.hud
 import com.aidanmars.nodesim.game.skija.hud.elements.*
 import com.aidanmars.nodesim.game.skija.hud.elements.nodes.*
 
-data class HudElementGroup(
-    val placeElement: HudElement = PlaceHudElement(),
-    val deleteElement: HudElement = DeleteHudElement(),
-    val interactElement: HudElement = InteractHudElement(),
-    val exitElement: HudElement = ExitHudElement(),
-    val connectElement: HudElement = ConnectHudElement(),
-    val switchElement: HudElement = SwitchHudElement(),
-    val lightElement: HudElement = LightHudElement(),
-    val norGateElement: HudElement = NorGateHudElement(),
-    val andGateElement: HudElement = AndGateHudElement(),
-    val xorGateElement: HudElement = XorGateHudElement(),
-    val snapElement: HudElement = SnapHudElement(),
-    val selectElement: HudElement = SelectHudElement()
-) {
+@Suppress("MemberVisibilityCanBePrivate")
+class HudElementGroup {
+
+    val placeElement = PlaceHudElement()
+    val deleteElement = DeleteHudElement()
+    val interactElement = InteractHudElement()
+    val exitElement = ExitHudElement()
+    val connectElement = ConnectHudElement()
+    val switchElement = SwitchHudElement()
+    val lightElement = LightHudElement()
+    val norGateElement = NorGateHudElement()
+    val andGateElement = AndGateHudElement()
+    val xorGateElement = XorGateHudElement()
+    val snapElement = SnapHudElement()
+    val selectElement = SelectHudElement()
+    val selectionElement = SelectionElement()
+    val yesNoElement = YesNoElement()
+
     fun addAllToList(list: MutableList<HudElement>) {
+        // low priority
+        list.add(selectionElement)
+
+        // medium priority
         list.add(placeElement)
         list.add(deleteElement)
         list.add(interactElement)
@@ -30,5 +38,8 @@ data class HudElementGroup(
         list.add(xorGateElement)
         list.add(snapElement)
         list.add(selectElement)
+
+        // high priority
+        list.add(yesNoElement)
     }
 }
