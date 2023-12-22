@@ -1,8 +1,8 @@
 package com.aidanmars.nodesim.game.skija.hud.elements
 
 import com.aidanmars.nodesim.game.skija.constants.Colors
-import com.aidanmars.nodesim.game.skija.NodeSimWindow
-import com.aidanmars.nodesim.game.skija.ToolType
+import com.aidanmars.nodesim.game.skija.core.NodeSimWindow
+import com.aidanmars.nodesim.game.skija.types.ToolType
 import com.aidanmars.nodesim.game.skija.*
 import com.aidanmars.nodesim.game.skija.constants.SvgDoms
 import com.aidanmars.nodesim.game.skija.hud.HudElement
@@ -10,7 +10,7 @@ import io.github.humbleui.skija.Canvas
 import io.github.humbleui.types.Point
 
 class PlaceHudElement : HudElement {
-    override var isHidden: Boolean = false
+    override var shouldDraw: Boolean = false
     override var isFocused: Boolean = false
 
     override fun draw(window: NodeSimWindow, canvas: Canvas) {

@@ -1,6 +1,7 @@
 package com.aidanmars.nodesim.game.skija
 
 import com.aidanmars.nodesim.core.Node
+import com.aidanmars.nodesim.game.skija.types.WorldLocation
 import io.github.humbleui.types.Point
 import kotlin.math.sqrt
 

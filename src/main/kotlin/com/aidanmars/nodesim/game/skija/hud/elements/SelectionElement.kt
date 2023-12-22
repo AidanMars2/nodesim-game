@@ -5,7 +5,9 @@ import com.aidanmars.nodesim.core.extensions.getNodesInRegion
 import com.aidanmars.nodesim.core.extensions.packageRegion
 import com.aidanmars.nodesim.game.skija.*
 import com.aidanmars.nodesim.game.skija.constants.SvgDoms
+import com.aidanmars.nodesim.game.skija.core.NodeSimWindow
 import com.aidanmars.nodesim.game.skija.hud.HudElement
+import com.aidanmars.nodesim.game.skija.types.WorldLocation
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.types.Point
 import kotlinx.coroutines.runBlocking
@@ -15,7 +17,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class SelectionElement : HudElement {
-    override var isHidden: Boolean = true
+    override var shouldDraw: Boolean = true
         set(value) {
             field = value
             isFocused = !field
@@ -148,13 +150,13 @@ class SelectionElement : HudElement {
         yesNoElement.text = text
         yesNoElement.yesCallBack = {
             onYes()
-            yesNoElement.isHidden = true
+            yesNoElement.shouldDraw = true
         }
         yesNoElement.noCallBack = {
-            yesNoElement.isHidden = true
+            yesNoElement.shouldDraw = true
         }
 
-        yesNoElement.isHidden = false
+        yesNoElement.shouldDraw = false
     }
 
     private fun setNodesInRegion(window: NodeSimWindow) {

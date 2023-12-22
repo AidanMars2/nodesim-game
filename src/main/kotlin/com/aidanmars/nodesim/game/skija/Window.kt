@@ -137,6 +137,8 @@ abstract class Window(val title: String) {
             }
         }
 
+        glfwSetWindowFocusCallback(window, ::onFocusEvent)
+
         glfwSetMouseButtonCallback(window, ::onMouseButtonEvent)
 
         glfwSetScrollCallback(window, ::onScroll)
@@ -159,7 +161,10 @@ abstract class Window(val title: String) {
 
     abstract fun onMouseButtonEvent(window: Long, button: Int, action: Int, mods: Int)
 
+    abstract fun onFocusEvent(window: Long, focused: Boolean)
+
     abstract fun init()
 
     abstract fun terminate()
+
 }

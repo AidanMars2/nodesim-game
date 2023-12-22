@@ -1,4 +1,4 @@
-package com.aidanmars.nodesim.game.skija
+package com.aidanmars.nodesim.game.skija.types
 
 import com.aidanmars.nodesim.core.getChunk
 import kotlin.math.sqrt

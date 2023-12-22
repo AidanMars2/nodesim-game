@@ -5,6 +5,9 @@ import com.aidanmars.nodesim.core.Node
 import com.aidanmars.nodesim.core.NodeType
 import com.aidanmars.nodesim.core.extensions.tick
 import com.aidanmars.nodesim.game.skija.hud.HudElementGroup
+import com.aidanmars.nodesim.game.skija.types.ToolType
+import com.aidanmars.nodesim.game.skija.types.VirtualScreenLocation
+import com.aidanmars.nodesim.game.skija.types.WorldLocation
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -29,12 +32,13 @@ class GameData(
     var circuit = Circuit()
     var selectionLocation1 = WorldLocation(0, 0)
     var selectionLocation2 = WorldLocation(0, 0)
+    var wasdKeysPressed = BooleanArray(4)
+
     var selectedNode: Pair<Node, Node?>? = null
     private var isHolding = false
     var sl2ShouldChaseMouse = false
     var showSelection = false
     var currentPlaceType = NodeType.Switch
-    var wasdKeysPressed = BooleanArray(4)
     var currentTool = ToolType.Interact
         set(value) {
             field = value

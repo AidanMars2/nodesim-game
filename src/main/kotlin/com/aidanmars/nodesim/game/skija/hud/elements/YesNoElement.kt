@@ -1,6 +1,6 @@
 package com.aidanmars.nodesim.game.skija.hud.elements
 
-import com.aidanmars.nodesim.game.skija.NodeSimWindow
+import com.aidanmars.nodesim.game.skija.core.NodeSimWindow
 import com.aidanmars.nodesim.game.skija.constants.SvgDoms
 import com.aidanmars.nodesim.game.skija.drawSvg
 import com.aidanmars.nodesim.game.skija.hud.HudElement
@@ -8,12 +8,11 @@ import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.Color
 import io.github.humbleui.skija.Font
 import io.github.humbleui.skija.Paint
-import io.github.humbleui.skija.Typeface
 import io.github.humbleui.types.Point
 import io.github.humbleui.types.Rect
 
 class YesNoElement : HudElement {
-    override var isHidden: Boolean = true
+    override var shouldDraw: Boolean = true
         set(value) {
             field = value
             isFocused = !field
