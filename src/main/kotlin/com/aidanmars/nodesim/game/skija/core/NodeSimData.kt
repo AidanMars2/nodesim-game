@@ -130,7 +130,6 @@ class NodeSimData {
 
     fun init() {
         startSimulation()
-        dataListenerHandler.initListeners(this)
     }
 
     fun terminate() {
