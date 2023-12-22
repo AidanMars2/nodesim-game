@@ -48,12 +48,12 @@ class SelectionElement : HudElement {
             SvgDoms.Hud.Selection.packageOption,
             packageOptionLocation, Point(30f, 30f)
         )
-        if (window.data.clickedMoveSelection) {
-            canvas.drawSvg(
-                SvgDoms.Hud.Selection.stopMoveButton,
-                stopMoveButtonLocation, Point(60f, 60f)
-            )
-        }
+//        if (window.data.clickedMoveSelection) {
+//            canvas.drawSvg(
+//                SvgDoms.Hud.Selection.stopMoveButton,
+//                stopMoveButtonLocation, Point(60f, 60f)
+//            )
+//        }
     }
 
     override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {
@@ -70,12 +70,12 @@ class SelectionElement : HudElement {
             packageOptionLocation.toCenterOfButton()
                 .distance(mouseLocation) <= 15f -> doPackage(window)
 
-            window.data.clickedMoveSelection &&
-                    stopMoveButtonLocation.toCenterOfStopMoveButton()
-                        .distance(mouseLocation) <= 30f -> {
-                            window.data.clickedMoveSelection = false
-                            window.data.movingNodes = setOf()
-                        }
+//            window.data.clickedMoveSelection &&
+//                    stopMoveButtonLocation.toCenterOfStopMoveButton()
+//                        .distance(mouseLocation) <= 30f -> {
+//                            window.data.clickedMoveSelection = false
+//                            window.data.movingNodes = setOf()
+//                        }
 
             else -> return false
         }
@@ -88,27 +88,27 @@ class SelectionElement : HudElement {
             GLFW_KEY_X -> doDelete(window)
             GLFW_KEY_C -> doCopy(window)
             GLFW_KEY_V -> doPackage(window)
-            GLFW_KEY_ESCAPE -> {
-                if (window.data.clickedMoveSelection) {
-                    window.data.clickedMoveSelection = false
-                    window.data.movingNodes = setOf()
-                } else {
-                    return false
-                }
-            }
+//            GLFW_KEY_ESCAPE -> {
+//                if (window.data.clickedMoveSelection) {
+//                    window.data.clickedMoveSelection = false
+//                    window.data.movingNodes = setOf()
+//                } else {
+//                    return false
+//                }
+//            }
             else -> return false
         }
         return true
     }
 
     private fun doMove(window: NodeSimWindow) {
-        window.data.movingNodes = window.data.circuit.getNodesInRegion(
-            min(window.data.selectionLocation1.x, window.data.selectionLocation2.x)..
-                    max(window.data.selectionLocation1.x, window.data.selectionLocation2.x),
-            min(window.data.selectionLocation1.y, window.data.selectionLocation2.y)..
-                    max(window.data.selectionLocation1.y, window.data.selectionLocation2.y)
-        )
-        window.data.clickedMoveSelection = true
+//        window.data.movingNodes = window.data.circuit.getNodesInRegion(
+//            min(window.data.selectionLocation1.x, window.data.selectionLocation2.x)..
+//                    max(window.data.selectionLocation1.x, window.data.selectionLocation2.x),
+//            min(window.data.selectionLocation1.y, window.data.selectionLocation2.y)..
+//                    max(window.data.selectionLocation1.y, window.data.selectionLocation2.y)
+//        )
+//        window.data.clickedMoveSelection = true
     }
 
     private fun doDelete(window: NodeSimWindow) {
@@ -146,17 +146,17 @@ class SelectionElement : HudElement {
 
     private inline fun withYesNo(window: NodeSimWindow, text: String, crossinline onYes: () -> Unit) {
         setNodesInRegion(window)
-        val yesNoElement = window.hudElementGroup.yesNoElement
-        yesNoElement.text = text
-        yesNoElement.yesCallBack = {
-            onYes()
-            yesNoElement.shouldDraw = true
-        }
-        yesNoElement.noCallBack = {
-            yesNoElement.shouldDraw = true
-        }
-
-        yesNoElement.shouldDraw = false
+//        val yesNoElement = window.hudElementGroup.yesNoElement
+//        yesNoElement.text = text
+//        yesNoElement.yesCallBack = {
+//            onYes()
+//            yesNoElement.shouldDraw = true
+//        }
+//        yesNoElement.noCallBack = {
+//            yesNoElement.shouldDraw = true
+//        }
+//
+//        yesNoElement.shouldDraw = false
     }
 
     private fun setNodesInRegion(window: NodeSimWindow) {
@@ -171,13 +171,13 @@ class SelectionElement : HudElement {
     private fun setButtonLocations(window: NodeSimWindow) {
         val topLeftX = min(window.data.selectionLocation1.x, window.data.selectionLocation2.x)
         val topLeftY = min(window.data.selectionLocation1.y, window.data.selectionLocation2.y)
-        val (screenX, screenY) = window.getTrueScreenLocation(WorldLocation(topLeftX, topLeftY))
-        val drawOriginX = screenX - 35f
-        val drawOriginY = screenY
-        copyOptionLocation = Point(drawOriginX, drawOriginY)
-        deleteOptionLocation = Point(drawOriginX, drawOriginY + 40f)
-        moveOptionLocation = Point(drawOriginX, drawOriginY + 80f)
-        packageOptionLocation = Point(drawOriginX, drawOriginY + 120f)
+//        val (screenX, screenY) = window.getTrueScreenLocation(WorldLocation(topLeftX, topLeftY))
+//        val drawOriginX = screenX - 35f
+//        val drawOriginY = screenY
+//        copyOptionLocation = Point(drawOriginX, drawOriginY)
+//        deleteOptionLocation = Point(drawOriginX, drawOriginY + 40f)
+//        moveOptionLocation = Point(drawOriginX, drawOriginY + 80f)
+//        packageOptionLocation = Point(drawOriginX, drawOriginY + 120f)
     }
 
     private fun Point.toCenterOfButton(): Point = Point(x + 15f, y + 15f)

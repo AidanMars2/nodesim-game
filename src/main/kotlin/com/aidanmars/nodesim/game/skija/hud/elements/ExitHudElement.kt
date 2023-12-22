@@ -26,7 +26,7 @@ class ExitHudElement : HudElement {
 
     override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {
         if (mouseLocation.distance(getButtonPoint(window)) > 60f) return false
-        window.closeGraceFully()
+//        window.closeGraceFully()
         return true
     }
 
