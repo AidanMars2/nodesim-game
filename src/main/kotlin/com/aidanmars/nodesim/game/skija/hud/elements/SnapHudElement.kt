@@ -65,7 +65,7 @@ class SnapHudElement: HudElement {
     override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {
         if (getButtonPoint(window).distance(mouseLocation) > 35f) return false
         cycleStage += 1
-        window.data.placeSnapDistance = getSnapDistance()
+//        window.data.placeSnapDistance = getSnapDistance()
         return true
     }
 
