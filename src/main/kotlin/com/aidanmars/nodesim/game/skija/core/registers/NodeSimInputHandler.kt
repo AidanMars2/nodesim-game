@@ -1,20 +1,21 @@
-package com.aidanmars.nodesim.game.skija.core
+package com.aidanmars.nodesim.game.skija.core.registers
 
-import com.aidanmars.nodesim.game.skija.listeners.KeyListener
-import com.aidanmars.nodesim.game.skija.listeners.MouseListener
-import com.aidanmars.nodesim.game.skija.listeners.ScrollListener
+import com.aidanmars.nodesim.game.skija.register.types.input.InputListener
+import com.aidanmars.nodesim.game.skija.register.types.input.KeyListener
+import com.aidanmars.nodesim.game.skija.register.types.input.MouseListener
+import com.aidanmars.nodesim.game.skija.register.types.input.ScrollListener
 import io.github.humbleui.types.Point
 import org.lwjgl.glfw.GLFW.*
 
 class NodeSimInputHandler {
-    val mouseListeners = mutableListOf<MouseListener>()
+    private val mouseListeners = mutableListOf<MouseListener>()
 
     /**
      * this value is to indicate what listener is listening to mouse events
      */
     private var currentSelectedMouseListener: MouseListener? = null
-    val keyListeners = mutableListOf<KeyListener>()
-    val scrollListeners = mutableListOf<ScrollListener>()
+    private val keyListeners = mutableListOf<KeyListener>()
+    private val scrollListeners = mutableListOf<ScrollListener>()
 
     fun onKeyEvent(action: Int, key: Int, mods: Int) {
         keyListeners.forEach {
@@ -54,7 +55,9 @@ class NodeSimInputHandler {
         }
     }
 
-    fun init(data: NodeSimData) {
-        //TODO: write init code including listener registration
+    fun register(listener: InputListener) {
+        if (listener is KeyListener) keyListeners.add(listener)
+        if (listener is MouseListener) mouseListeners.add(listener)
+        if (listener is ScrollListener) scrollListeners.add(listener)
     }
 }

@@ -1,4 +1,4 @@
-package com.aidanmars.nodesim.game.skija.actors
+package com.aidanmars.nodesim.game.skija.register.types.actors
 
 import io.github.humbleui.skija.Canvas
 

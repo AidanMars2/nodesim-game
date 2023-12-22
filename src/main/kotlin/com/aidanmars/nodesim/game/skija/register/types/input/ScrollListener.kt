@@ -1,6 +1,6 @@
-package com.aidanmars.nodesim.game.skija.listeners
+package com.aidanmars.nodesim.game.skija.register.types.input
 
-interface ScrollListener : Listener {
+interface ScrollListener : InputListener {
     /**
      * @return true if the event should not be passed further down the chain
      */

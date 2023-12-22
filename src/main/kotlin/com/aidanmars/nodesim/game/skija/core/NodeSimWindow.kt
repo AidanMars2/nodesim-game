@@ -1,6 +1,14 @@
 package com.aidanmars.nodesim.game.skija.core
 
+import com.aidanmars.nodesim.game.skija.register.types.RegisterAble
 import com.aidanmars.nodesim.game.skija.Window
+import com.aidanmars.nodesim.game.skija.core.registers.NodeSimActorHandler
+import com.aidanmars.nodesim.game.skija.core.registers.NodeSimInputHandler
+import com.aidanmars.nodesim.game.skija.core.registers.NodeSimRenderer
+import com.aidanmars.nodesim.game.skija.register.types.actors.ConstantActor
+import com.aidanmars.nodesim.game.skija.register.types.actors.DrawAble
+import com.aidanmars.nodesim.game.skija.register.types.data.DataListener
+import com.aidanmars.nodesim.game.skija.register.types.input.InputListener
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.types.IRect
 import io.github.humbleui.types.Point
@@ -414,9 +422,9 @@ class NodeSimWindow : Window("NodeSim") {
     //</editor-fold>
 
     val data = NodeSimData()
-    val inputHandler = NodeSimInputHandler()
-    val renderer = NodeSimRenderer()
-    val actorActor = NodeSimActorActor()
+    private val inputHandler = NodeSimInputHandler()
+    private val renderer = NodeSimRenderer()
+    private val actorActor = NodeSimActorHandler()
 
     override fun onKeyPress(window: Long, key: Int, scanCode: Int, action: Int, mods: Int) {
         inputHandler.onKeyEvent(action, key, mods)
@@ -427,18 +435,20 @@ class NodeSimWindow : Window("NodeSim") {
     }
 
     override fun onMouseButtonEvent(window: Long, button: Int, action: Int, mods: Int) {
-        inputHandler.onMouseButtonEvent(action, button, Point(xPos.toFloat(), yPos.toFloat()))
+        inputHandler.onMouseButtonEvent(action, button, Point(mouseX.toFloat(), mouseY.toFloat()))
     }
 
     override fun onFocusEvent(window: Long, focused: Boolean) {
         // make sure the mouse release function is called
-        inputHandler.onMouseButtonEvent(GLFW_RELEASE, GLFW_MOUSE_BUTTON_1, Point(xPos.toFloat(), yPos.toFloat()))
+        inputHandler.onMouseButtonEvent(GLFW_RELEASE, GLFW_MOUSE_BUTTON_1, Point(mouseX.toFloat(), mouseY.toFloat()))
+    }
+
+    override fun onMouseMoveEvent(newMousePoint: Point) {
+        inputHandler.onMouseMoveEvent(newMousePoint)
     }
 
     override fun init() {
-        renderer.init(data)
-        inputHandler.init(data)
-        actorActor.init(data)
+        fillRegister()
         data.init()
     }
 
@@ -452,6 +462,13 @@ class NodeSimWindow : Window("NodeSim") {
         data.windowWidth = width
         data.windowHeight = height
         renderer.draw(canvas)
+    }
+
+    fun register(registerAble: RegisterAble) {
+        if (registerAble is ConstantActor) actorActor.register(registerAble)
+        if (registerAble is DrawAble) renderer.register(registerAble)
+        if (registerAble is DataListener) data.dataListenerHandler.register(registerAble)
+        if (registerAble is InputListener) inputHandler.register(registerAble)
     }
 
     fun runGame() {

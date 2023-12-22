@@ -4,6 +4,7 @@ import com.aidanmars.nodesim.core.Circuit
 import com.aidanmars.nodesim.core.Node
 import com.aidanmars.nodesim.core.NodeType
 import com.aidanmars.nodesim.core.extensions.tick
+import com.aidanmars.nodesim.game.skija.core.registers.NodeSimDataListenerHandler
 import com.aidanmars.nodesim.game.skija.types.ToolType
 import com.aidanmars.nodesim.game.skija.types.VirtualScreenLocation
 import com.aidanmars.nodesim.game.skija.types.WorldLocation
@@ -34,6 +35,10 @@ class NodeSimData {
     val playerY: Int
         get() = playerLocation.y
     var scale = 1f
+        set(value) {
+            field = value
+            dataListenerHandler.onPlayerMove()
+        }
 
     // circuit
     var circuit = Circuit()

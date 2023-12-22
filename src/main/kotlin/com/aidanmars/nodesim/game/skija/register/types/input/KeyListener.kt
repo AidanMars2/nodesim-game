@@ -1,6 +1,6 @@
-package com.aidanmars.nodesim.game.skija.listeners
+package com.aidanmars.nodesim.game.skija.register.types.input
 
-interface KeyListener : Listener {
+interface KeyListener : InputListener {
     /**
      * keep in mind that this function may be called for the same key before said key has been released.
      * @param key the key pressed.

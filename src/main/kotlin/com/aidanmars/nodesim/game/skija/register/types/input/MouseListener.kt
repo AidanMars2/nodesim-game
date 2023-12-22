@@ -1,8 +1,8 @@
-package com.aidanmars.nodesim.game.skija.listeners
+package com.aidanmars.nodesim.game.skija.register.types.input
 
 import io.github.humbleui.types.Point
 
-interface MouseListener : Listener {
+interface MouseListener : InputListener {
 
     /**
      * called when a click occurs on screen

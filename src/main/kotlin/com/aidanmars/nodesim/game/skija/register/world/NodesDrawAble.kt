@@ -1,7 +1,7 @@
-package com.aidanmars.nodesim.game.skija.actors.drawables
+package com.aidanmars.nodesim.game.skija.register.world
 
 import com.aidanmars.nodesim.core.Node
-import com.aidanmars.nodesim.game.skija.actors.DrawAble
+import com.aidanmars.nodesim.game.skija.register.types.actors.DrawAble
 import com.aidanmars.nodesim.game.skija.core.NodeSimData
 import com.aidanmars.nodesim.game.skija.location
 import com.aidanmars.nodesim.game.skija.world.drawNode

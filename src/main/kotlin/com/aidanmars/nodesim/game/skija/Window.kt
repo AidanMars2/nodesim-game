@@ -15,8 +15,8 @@ abstract class Window(val title: String) {
     var width: Int = 0
     var height: Int = 0
     private var dpi: Float = 1f
-    var xPos: Int = 0
-    var yPos: Int = 0
+    var mouseX: Int = 0
+    var mouseY: Int = 0
     private var vsync: Boolean = true
     private lateinit var refreshRates: IntArray
     private val os = System.getProperty("os.name").lowercase(Locale.getDefault())
@@ -74,8 +74,8 @@ abstract class Window(val title: String) {
 
         glfwSetWindowPos(window, bounds.left, bounds.top)
         updateDimensions()
-        xPos = width / 2
-        yPos = height / 2
+        mouseX = width / 2
+        mouseY = height / 2
 
         glfwMakeContextCurrent(window)
         glfwSwapInterval(if (vsync) 1 else 0) // Enable v-sync
@@ -127,14 +127,15 @@ abstract class Window(val title: String) {
             draw(canvas!!)
         }
 
-        glfwSetCursorPosCallback(window) { window: Long, xpos: Double, ypos: Double ->
+        glfwSetCursorPosCallback(window) { window: Long, newX: Double, newY: Double ->
             if (os.contains("mac") || os.contains("darwin")) {
-                this.xPos = xpos.toInt()
-                this.yPos = ypos.toInt()
+                mouseX = newX.toInt()
+                mouseY = newY.toInt()
             } else {
-                this.xPos = (xpos / dpi).toInt()
-                this.yPos = (ypos / dpi).toInt()
+                mouseX = (newX / dpi).toInt()
+                mouseY = (newY / dpi).toInt()
             }
+            onMouseMoveEvent(Point(mouseX.toFloat(), mouseY.toFloat()))
         }
 
         glfwSetWindowFocusCallback(window, ::onFocusEvent)
@@ -162,6 +163,8 @@ abstract class Window(val title: String) {
     abstract fun onMouseButtonEvent(window: Long, button: Int, action: Int, mods: Int)
 
     abstract fun onFocusEvent(window: Long, focused: Boolean)
+
+    abstract fun onMouseMoveEvent(newMousePoint: Point)
 
     abstract fun init()
 
