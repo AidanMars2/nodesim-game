@@ -8,15 +8,15 @@ object SvgDoms {
         val deleteElement = getSvgFromResource("hud/deleteElement.svg")
         val interactElement = getSvgFromResource("hud/interactElement.svg")
         val placeElement = getSvgFromResource("hud/placeElement.svg")
-        val selectElement = getSvgFromResource("hud/selectElement.svg")
-        val yesNoElement = getSvgFromResource("hud/yesNoElement.svg")
-        object Selection {
-            val copyOption = getSvgFromResource("hud/selection/copyOption.svg")
-            val deleteOption = getSvgFromResource("hud/selection/deleteOption.svg")
-            val moveOption = getSvgFromResource("hud/selection/moveOption.svg")
-            val packageOption = getSvgFromResource("hud/selection/packageOption.svg")
-            val stopMoveButton = getSvgFromResource("hud/selection/stopMoveButton.svg")
-        }
+//        val selectElement = getSvgFromResource("hud/selectElement.svg")
+//        val yesNoElement = getSvgFromResource("hud/yesNoElement.svg")
+//        object Selection {
+//            val copyOption = getSvgFromResource("hud/selection/copyOption.svg")
+//            val deleteOption = getSvgFromResource("hud/selection/deleteOption.svg")
+//            val moveOption = getSvgFromResource("hud/selection/moveOption.svg")
+//            val packageOption = getSvgFromResource("hud/selection/packageOption.svg")
+//            val stopMoveButton = getSvgFromResource("hud/selection/stopMoveButton.svg")
+//        }
     }
     object Nodes {
         val switchOff = getSvgFromResource("nodes/switch-off.svg")

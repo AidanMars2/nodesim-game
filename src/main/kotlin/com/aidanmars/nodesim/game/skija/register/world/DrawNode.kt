@@ -1,11 +1,10 @@
-package com.aidanmars.nodesim.game.skija.world
+package com.aidanmars.nodesim.game.skija.register.world
 
 import com.aidanmars.nodesim.core.Node
 import com.aidanmars.nodesim.core.NodeType
 import com.aidanmars.nodesim.game.skija.*
 import com.aidanmars.nodesim.game.skija.constants.SvgDoms
 import com.aidanmars.nodesim.game.skija.core.NodeSimData
-import com.aidanmars.nodesim.game.skija.core.NodeSimWindow
 import com.aidanmars.nodesim.game.skija.types.WorldLocation
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.svg.SVGDOM

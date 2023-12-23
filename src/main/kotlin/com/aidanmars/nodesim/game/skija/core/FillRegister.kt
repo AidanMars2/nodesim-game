@@ -1,17 +1,42 @@
 package com.aidanmars.nodesim.game.skija.core
 
-import com.aidanmars.nodesim.game.skija.register.MovementRegisterAble
+import com.aidanmars.nodesim.game.skija.register.MovementHandler
+import com.aidanmars.nodesim.game.skija.register.hud.*
 import com.aidanmars.nodesim.game.skija.register.world.BackGroundDrawAble
 import com.aidanmars.nodesim.game.skija.register.world.NodesDrawAble
 
 fun NodeSimWindow.fillRegister() {
-    // drawable priority goes from low to high,
-    // listener/actor priority goes from high to low
+    // registerAbles registered first will be drawn on top and take input first,
+    // and hence have the opportunity to block input to other registerAbles
 
-    // world drawAbles (low prio)
-    register(BackGroundDrawAble(data))
-    register(NodesDrawAble(data))
+    // high priority (things like a yes/no screen)
+    run {
 
-    // player movement (high prio)
-    register(MovementRegisterAble(data))
+    }
+
+    // medium priority (things like the heads-up display)
+    run {
+        // exit/close
+        register(ExitHudElement(data))
+
+        // snap distance button
+        register(SnapHudElement(data))
+
+        // toolbar
+        register(PlaceHudElement(data))
+        register(DeleteHudElement(data))
+        register(InteractHudElement(data))
+        register(ConnectHudElement(data))
+
+        // player movement
+        register(MovementHandler(data))
+    }
+
+    // low priority (things like the background)
+    run {
+
+        // world drawAbles
+        register(NodesDrawAble(data))// nodes on top of the lines
+        register(BackGroundDrawAble(data))
+    }
 }

@@ -11,8 +11,8 @@ class NodeSimRenderer {
     }
 
     fun draw(canvas: Canvas) {
-        drawAbles.forEach {
-            it.draw(canvas)
+        for (index in drawAbles.indices.reversed()) {
+            drawAbles[index].draw(canvas)
         }
     }
 }

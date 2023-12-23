@@ -1,7 +1,7 @@
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0,0,70,70">
     <g transform="translate(35, 35)">
         <circle r="32.5" fill="rgb(0, 128, 255)" stroke="rgb(0, 64, 128)" stroke-width="5"/>
-        <circle r="19" fill="white"/>
+        <circle r="18" fill="white"/>
         <path d="M0, 0L3, 24L17.5, 17Z"
               stroke="rgb(0, 128, 255)"
               stroke-linejoin="round"

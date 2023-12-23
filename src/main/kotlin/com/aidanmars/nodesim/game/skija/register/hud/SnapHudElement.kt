@@ -1,21 +1,22 @@
-package com.aidanmars.nodesim.game.skija.hud.elements
+package com.aidanmars.nodesim.game.skija.register.hud
 
-import com.aidanmars.nodesim.game.skija.*
+import com.aidanmars.nodesim.game.skija.component1
+import com.aidanmars.nodesim.game.skija.component2
 import com.aidanmars.nodesim.game.skija.constants.Colors
-import com.aidanmars.nodesim.game.skija.core.NodeSimWindow
-import com.aidanmars.nodesim.game.skija.hud.HudElement
+import com.aidanmars.nodesim.game.skija.core.NodeSimData
+import com.aidanmars.nodesim.game.skija.distance
+import com.aidanmars.nodesim.game.skija.drawCircle
+import com.aidanmars.nodesim.game.skija.register.types.actors.DrawAble
+import com.aidanmars.nodesim.game.skija.register.types.input.MouseListener
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.Paint
 import io.github.humbleui.skija.PaintStrokeCap
 import io.github.humbleui.types.Point
 
-class SnapHudElement: HudElement {
-    override var shouldDraw: Boolean = false
-    override var isFocused: Boolean = false
-    var cycleStage = 0
-        set(value) {field = value % 3}
+class SnapHudElement(override val data: NodeSimData) : MouseListener, DrawAble {
+    private var cycleStage = 0
 
-    fun getSnapDistance(): Int {
+    private fun getSnapDistance(): Int {
         return when (cycleStage) {
             0 -> 1
             1 -> 40
@@ -24,8 +25,8 @@ class SnapHudElement: HudElement {
         }
     }
 
-    override fun draw(window: NodeSimWindow, canvas: Canvas) {
-        val point = getButtonPoint(window)
+    override fun draw(canvas: Canvas) {
+        val point = getButtonPoint()
         val (x, y) = point
         canvas.drawCircle(point, 35f, Colors.tileLine)
         canvas.drawCircle(point, 30f, Colors.snapElementMain)
@@ -62,19 +63,17 @@ class SnapHudElement: HudElement {
         }
     }
 
-    override fun onClick(window: NodeSimWindow, mouseLocation: Point): Boolean {
-        if (getButtonPoint(window).distance(mouseLocation) > 35f) return false
+    override fun onPress(clickLocation: Point): Boolean {
+        if (getButtonPoint().distance(clickLocation) > 35f) return false
         cycleStage += 1
-//        window.data.placeSnapDistance = getSnapDistance()
+        cycleStage %= 3
+        data.placeSnapDistance = getSnapDistance()
         return true
     }
 
-    override fun onKeyEvent(window: NodeSimWindow, key: Int, mods: Int): Boolean {
-        isFocused = false
-        return false
-    }
+    override fun onDrag(newLocation: Point) {}
 
-    private fun getButtonPoint(window: NodeSimWindow): Point {
-        return Point(window.width - 60f, 200f)
-    }
+    override fun onRelease(clickLocation: Point) {}
+
+    private fun getButtonPoint() = Point(data.windowWidth - 60f, 180f)
 }

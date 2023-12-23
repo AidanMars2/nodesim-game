@@ -1,4 +1,4 @@
-package com.aidanmars.nodesim.game.skija.world
+package com.aidanmars.nodesim.game.skija.register.world
 
 import com.aidanmars.nodesim.game.skija.constants.Colors
 import com.aidanmars.nodesim.game.skija.angleBetweenPoints
