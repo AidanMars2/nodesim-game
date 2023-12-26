@@ -7,13 +7,15 @@ import com.aidanmars.nodesim.game.skija.core.NodeSimData
 import com.aidanmars.nodesim.game.skija.distance
 import com.aidanmars.nodesim.game.skija.drawCircle
 import com.aidanmars.nodesim.game.skija.register.types.actors.DrawAble
+import com.aidanmars.nodesim.game.skija.register.types.actors.HudDrawAble
+import com.aidanmars.nodesim.game.skija.register.types.input.ClickLayer
 import com.aidanmars.nodesim.game.skija.register.types.input.MouseListener
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.Paint
 import io.github.humbleui.skija.PaintStrokeCap
 import io.github.humbleui.types.Point
 
-class SnapHudElement(override val data: NodeSimData) : MouseListener, DrawAble {
+class SnapHudElement(override val data: NodeSimData) : MouseListener, HudDrawAble {
     private var cycleStage = 0
 
     private fun getSnapDistance(): Int {
@@ -25,7 +27,7 @@ class SnapHudElement(override val data: NodeSimData) : MouseListener, DrawAble {
         }
     }
 
-    override fun draw(canvas: Canvas) {
+    override fun drawHud(canvas: Canvas) {
         val point = getButtonPoint()
         val (x, y) = point
         canvas.drawCircle(point, 35f, Colors.tileLine)
@@ -63,7 +65,8 @@ class SnapHudElement(override val data: NodeSimData) : MouseListener, DrawAble {
         }
     }
 
-    override fun onPress(clickLocation: Point): Boolean {
+    override fun onPress(clickLocation: Point, clickLayer: ClickLayer): Boolean {
+        if (clickLayer != ClickLayer.Hud) return false
         if (getButtonPoint().distance(clickLocation) > 35f) return false
         cycleStage += 1
         cycleStage %= 3
@@ -71,9 +74,9 @@ class SnapHudElement(override val data: NodeSimData) : MouseListener, DrawAble {
         return true
     }
 
-    override fun onDrag(newLocation: Point) {}
+    override fun onDrag(newLocation: Point, clickLayer: ClickLayer) {}
 
-    override fun onRelease(clickLocation: Point) {}
+    override fun onRelease(clickLocation: Point, clickLayer: ClickLayer) {}
 
     private fun getButtonPoint() = Point(data.windowWidth - 60f, 180f)
 }

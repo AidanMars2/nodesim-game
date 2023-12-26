@@ -7,13 +7,14 @@ import com.aidanmars.nodesim.game.skija.component2
 import com.aidanmars.nodesim.game.skija.constants.Colors
 import com.aidanmars.nodesim.game.skija.constants.Constants.SIZE_CHUNK
 import com.aidanmars.nodesim.game.skija.constants.Constants.SIZE_TILE
+import com.aidanmars.nodesim.game.skija.register.types.actors.WorldDrawAble
 import com.aidanmars.nodesim.game.skija.types.WorldLocation
 import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.Paint
 import kotlin.math.ceil
 
-class BackGroundDrawAble(override val data: NodeSimData) : DrawAble {
-    override fun draw(canvas: Canvas) {
+class BackGroundDrawAble(override val data: NodeSimData) : WorldDrawAble {
+    override fun drawWorld(canvas: Canvas) {
         val tileSize = data.scale * SIZE_TILE
         val (worldTopLeftX, worldTopLeftY) = data.topLeftScreenLocation()
 

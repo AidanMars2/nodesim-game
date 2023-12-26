@@ -4,10 +4,11 @@ import com.aidanmars.nodesim.core.Node
 import com.aidanmars.nodesim.game.skija.register.types.actors.DrawAble
 import com.aidanmars.nodesim.game.skija.core.NodeSimData
 import com.aidanmars.nodesim.game.skija.location
+import com.aidanmars.nodesim.game.skija.register.types.actors.WorldDrawAble
 import io.github.humbleui.skija.Canvas
 
-class NodesDrawAble(override val data: NodeSimData) : DrawAble {
-    override fun draw(canvas: Canvas) {
+class NodesDrawAble(override val data: NodeSimData) : WorldDrawAble {
+    override fun drawWorld(canvas: Canvas) {
         data.nodesOnScreen.forEach {
             drawNode(it, data, canvas)
         }

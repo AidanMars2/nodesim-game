@@ -2,7 +2,6 @@ package com.aidanmars.nodesim.game.skija.core
 
 import com.aidanmars.nodesim.core.Circuit
 import com.aidanmars.nodesim.core.Node
-import com.aidanmars.nodesim.core.NodeType
 import com.aidanmars.nodesim.core.extensions.tick
 import com.aidanmars.nodesim.game.skija.core.registers.NodeSimDataListenerHandler
 import com.aidanmars.nodesim.game.skija.distanceToLine
@@ -25,9 +24,15 @@ class NodeSimData(
     // listeners
     val dataListenerHandler = NodeSimDataListenerHandler()
 
+    // action verification values
+    var isAskingVerification = false
+        private set
+
     // window info
     var windowWidth = 0
     var windowHeight = 0
+    var mouseWorldX = 0
+    var mouseWorldY = 0
 
     // player location info
     var playerLocation = WorldLocation(0, 0)
@@ -52,12 +57,6 @@ class NodeSimData(
 
     // quick rendering values
     val nodesOnScreen = mutableSetOf<Node>()
-
-    // player interaction information (deprecated)
-    @Deprecated("move to listeners")
-    var selectionLocation1 = WorldLocation(0, 0)
-    var selectionLocation2 = WorldLocation(0, 0)
-    var currentPlaceType = NodeType.Switch
 
     var placeSnapDistance = 1
     var currentTool = ToolType.Interact
@@ -153,6 +152,18 @@ class NodeSimData(
     }
     //</editor-fold>
 
+    //<editor-fold desc="verification functions" defaultstate="collapsed">
+    fun startVerification() {
+        if (isAskingVerification) return
+        isAskingVerification = true
+    }
+
+    fun answerVerification(answer: Boolean) {
+        if (!isAskingVerification) return
+        isAskingVerification = false
+        dataListenerHandler.onYesNoAnswer(answer)
+    }
+    //</editor-fold>
     inline fun withCircuitMutexLocked(crossinline block: () -> Unit) {
         runBlocking {
             circuitMutex.withLock {

@@ -44,6 +44,9 @@ class NodeSimWindow : Window("NodeSim") {
     }
 
     override fun onMouseMoveEvent(newMousePoint: Point) {
+        val (mouseWorldX, mouseWorldY) = data.worldLocationAt(newMousePoint)
+        data.mouseWorldX = mouseWorldX
+        data.mouseWorldY = mouseWorldY
         inputHandler.onMouseMoveEvent(newMousePoint)
     }
 

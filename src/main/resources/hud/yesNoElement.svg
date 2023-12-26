@@ -1,7 +1,0 @@
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0,0,200,100">
-    <rect x="2.5" y="2.5" width="195" height="95" fill="white" rx="20" stroke-width="5" stroke="black"/>
-    <rect x="20" y="60" width="60" height="25" fill="green" rx="5" stroke="black" stroke-width="3"/>
-    <text x="35" y="76.25" font-family="system-ui">yes</text>
-    <rect x="120" y="60" width="60" height="25" fill="red" rx="5" stroke="black" stroke-width="3"/>
-    <text x="140" y="76.25" font-family="system-ui">no</text>
-</svg>

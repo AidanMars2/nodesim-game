@@ -1,4 +1,4 @@
-package com.aidanmars.nodesim.game.skija.register.hud
+package com.aidanmars.nodesim.game.skija.register.tools
 
 import com.aidanmars.nodesim.core.NodeType
 import com.aidanmars.nodesim.game.skija.*
@@ -6,6 +6,8 @@ import com.aidanmars.nodesim.game.skija.constants.Colors
 import com.aidanmars.nodesim.game.skija.constants.SvgDoms
 import com.aidanmars.nodesim.game.skija.core.NodeSimData
 import com.aidanmars.nodesim.game.skija.register.types.actors.DrawAble
+import com.aidanmars.nodesim.game.skija.register.types.actors.HudDrawAble
+import com.aidanmars.nodesim.game.skija.register.types.input.ClickLayer
 import com.aidanmars.nodesim.game.skija.register.types.input.KeyListener
 import com.aidanmars.nodesim.game.skija.register.types.input.MouseListener
 import com.aidanmars.nodesim.game.skija.types.ToolType
@@ -14,11 +16,11 @@ import io.github.humbleui.skija.Canvas
 import io.github.humbleui.types.Point
 import org.lwjgl.glfw.GLFW.*
 
-class PlaceHudElement(override val data: NodeSimData) : KeyListener, MouseListener, DrawAble {
+class PlaceTool(override val data: NodeSimData) : KeyListener, MouseListener, HudDrawAble {
     private var clickedWorld = false
     private var currentPlaceType = NodeType.Switch
 
-    override fun draw(canvas: Canvas) {
+    override fun drawHud(canvas: Canvas) {
         val point = getButtonPoint()
         val (x, y) = point
         if (data.currentTool == ToolType.Place) {
@@ -83,43 +85,42 @@ class PlaceHudElement(override val data: NodeSimData) : KeyListener, MouseListen
         return false
     }
 
-    override fun onPress(clickLocation: Point): Boolean {
+    override fun onPress(clickLocation: Point, clickLayer: ClickLayer): Boolean {
+        return when (clickLayer) {
+            ClickLayer.Overlay -> false
+            ClickLayer.Hud -> onHudPress(clickLocation)
+            ClickLayer.World -> data.currentTool == ToolType.Place
+        }
+    }
+
+    private fun onHudPress(clickLocation: Point): Boolean {
         if (clickLocation.distance(getButtonPoint()) <= 35f) {
             data.currentTool = ToolType.Place
             return true
         }
         if (data.currentTool != ToolType.Place) return false
-        when {
-            clickLocation.distance(getSwitchButtonPoint()) <= 35f -> currentPlaceType = NodeType.Switch
-            clickLocation.distance(getLightButtonPoint()) <= 35f -> currentPlaceType = NodeType.Light
-            clickLocation.distance(getNorGateButtonPoint()) <= 35f -> currentPlaceType = NodeType.NorGate
-            clickLocation.distance(getAndGateButtonPoint()) <= 35f -> currentPlaceType = NodeType.AndGate
-            clickLocation.distance(getXorGateButtonPoint()) <= 35f -> currentPlaceType = NodeType.XorGate
+        currentPlaceType = when {
+            clickLocation.distance(getSwitchButtonPoint()) <= 35f -> NodeType.Switch
+            clickLocation.distance(getLightButtonPoint()) <= 35f -> NodeType.Light
+            clickLocation.distance(getNorGateButtonPoint()) <= 35f -> NodeType.NorGate
+            clickLocation.distance(getAndGateButtonPoint()) <= 35f -> NodeType.AndGate
+            clickLocation.distance(getXorGateButtonPoint()) <= 35f -> NodeType.XorGate
 
             else -> {
-                clickedWorld = true
-                onWorldPress(data.worldLocationAt(clickLocation))
+                return false
             }
         }
         return true
     }
 
-    override fun onDrag(newLocation: Point) {
-        if (clickedWorld) {
-            onWorldDrag(data.worldLocationAt(newLocation))
-        }
-    }
+    override fun onDrag(newLocation: Point, clickLayer: ClickLayer) {}
 
-    override fun onRelease(clickLocation: Point) {
-        if (clickedWorld) {
+    override fun onRelease(clickLocation: Point, clickLayer: ClickLayer) {
+        if (clickLayer == ClickLayer.World) {
             onWorldRelease(data.worldLocationAt(clickLocation))
             clickedWorld = false
         }
     }
-
-    private fun onWorldPress(clickLocation: WorldLocation) {}
-
-    private fun onWorldDrag(newLocation: WorldLocation) {}
 
     private fun onWorldRelease(clickLocation: WorldLocation) {
         data.withCircuitMutexLocked {

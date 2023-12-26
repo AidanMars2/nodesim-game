@@ -1,4 +1,4 @@
-package com.aidanmars.nodesim.game.skija.register.hud
+package com.aidanmars.nodesim.game.skija.register.tools
 
 import com.aidanmars.nodesim.game.skija.constants.SvgDoms
 import com.aidanmars.nodesim.game.skija.core.NodeSimData
@@ -9,7 +9,7 @@ import io.github.humbleui.skija.svg.SVGDOM
 import io.github.humbleui.types.Point
 import org.lwjgl.glfw.GLFW
 
-class DeleteHudElement(override val data: NodeSimData) : ToolBarElement() {
+class DeleteTool(override val data: NodeSimData) : NodeSimTool() {
     override val toolType: ToolType = ToolType.Delete
     override val buttonIcon: SVGDOM = SvgDoms.Hud.deleteElement
     override val keyToSelect: Int = GLFW.GLFW_KEY_R

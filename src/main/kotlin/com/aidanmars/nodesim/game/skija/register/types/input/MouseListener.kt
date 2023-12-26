@@ -11,9 +11,9 @@ interface MouseListener : InputListener {
      * and the [onDrag] function will be called on only this listener until the [onRelease] function is called once,
      * then other listeners may accept events again.
      */
-    fun onPress(clickLocation: Point): Boolean
+    fun onPress(clickLocation: Point, clickLayer: ClickLayer): Boolean
 
-    fun onRelease(clickLocation: Point)
+    fun onRelease(clickLocation: Point, clickLayer: ClickLayer)
 
-    fun onDrag(newLocation: Point)
+    fun onDrag(newLocation: Point, clickLayer: ClickLayer)
 }

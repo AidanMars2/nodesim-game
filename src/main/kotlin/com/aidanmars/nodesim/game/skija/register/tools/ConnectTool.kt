@@ -1,4 +1,4 @@
-package com.aidanmars.nodesim.game.skija.register.hud
+package com.aidanmars.nodesim.game.skija.register.tools
 
 import com.aidanmars.nodesim.core.Node
 import com.aidanmars.nodesim.game.skija.constants.SvgDoms
@@ -12,7 +12,7 @@ import io.github.humbleui.skija.svg.SVGDOM
 import io.github.humbleui.types.Point
 import org.lwjgl.glfw.GLFW.*
 
-class ConnectHudElement(override val data: NodeSimData) : ToolBarElement() {
+class ConnectTool(override val data: NodeSimData) : NodeSimTool() {
     override val toolType: ToolType = ToolType.Connect
     override val buttonIcon: SVGDOM = SvgDoms.Hud.connectElement
     override val keyToSelect: Int = GLFW_KEY_G

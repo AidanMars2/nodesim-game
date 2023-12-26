@@ -1,8 +1,11 @@
-package com.aidanmars.nodesim.game.skija.register.hud
+package com.aidanmars.nodesim.game.skija.register.tools
 
 import com.aidanmars.nodesim.game.skija.*
 import com.aidanmars.nodesim.game.skija.constants.Colors
 import com.aidanmars.nodesim.game.skija.register.types.actors.DrawAble
+import com.aidanmars.nodesim.game.skija.register.types.actors.HudDrawAble
+import com.aidanmars.nodesim.game.skija.register.types.actors.WorldDrawAble
+import com.aidanmars.nodesim.game.skija.register.types.input.ClickLayer
 import com.aidanmars.nodesim.game.skija.register.types.input.KeyListener
 import com.aidanmars.nodesim.game.skija.register.types.input.MouseListener
 import com.aidanmars.nodesim.game.skija.types.ToolType
@@ -11,40 +14,43 @@ import io.github.humbleui.skija.Canvas
 import io.github.humbleui.skija.svg.SVGDOM
 import io.github.humbleui.types.Point
 
-abstract class ToolBarElement : MouseListener, KeyListener, DrawAble {
-    abstract val toolType: ToolType?
+abstract class NodeSimTool : MouseListener, KeyListener, HudDrawAble, WorldDrawAble {
+    abstract val toolType: ToolType
     abstract val buttonIcon: SVGDOM
     abstract val keyToSelect: Int
-    private var clickedWorld = false
 
-    override fun onPress(clickLocation: Point): Boolean {
-        if (clickLocation.distance(getButtonPoint()) > 35f) {
-            if (data.currentTool == toolType) {
-                clickedWorld = true
-                onWorldPress(data.worldLocationAt(clickLocation))
+    override fun onPress(clickLocation: Point, clickLayer: ClickLayer): Boolean {
+        when (clickLayer) {
+            ClickLayer.Overlay -> return false
+            ClickLayer.Hud -> {
+                if (clickLocation.distance(getButtonPoint()) > 35f) return false
+
+                data.currentTool = toolType
                 return true
             }
-            return false
+            ClickLayer.World -> {
+                if (data.currentTool == toolType) {
+                    onWorldPress(data.worldLocationAt(clickLocation))
+                    return true
+                }
+            }
         }
-        if (toolType != null) data.currentTool = toolType!!
-        return true
+        return false
     }
 
-    override fun onDrag(newLocation: Point) {
-        if (clickedWorld) {
+    override fun onDrag(newLocation: Point, clickLayer: ClickLayer) {
+        if (clickLayer == ClickLayer.World) {
             onWorldDrag(data.worldLocationAt(newLocation))
         }
     }
 
-    override fun onRelease(clickLocation: Point) {
-        if (clickedWorld) {
+    override fun onRelease(clickLocation: Point, clickLayer: ClickLayer) {
+        if (clickLayer == ClickLayer.World) {
             onWorldRelease(data.worldLocationAt(clickLocation))
-            clickedWorld = false
         }
     }
 
-    override fun draw(canvas: Canvas) {
-        drawSelection(canvas)
+    override fun drawHud(canvas: Canvas) {
         val point = getButtonPoint()
         val (x, y) = point
         if (data.currentTool == toolType) {
@@ -57,9 +63,13 @@ abstract class ToolBarElement : MouseListener, KeyListener, DrawAble {
         )
     }
 
+    override fun drawWorld(canvas: Canvas) {
+        if (data.currentTool == toolType) drawSelection(canvas)
+    }
+
     override fun onKeyPress(key: Int, mods: Int): Boolean {
         if (key != keyToSelect) return false
-        if (toolType != null) data.currentTool = toolType!!
+        data.currentTool = toolType
 
         return true
     }

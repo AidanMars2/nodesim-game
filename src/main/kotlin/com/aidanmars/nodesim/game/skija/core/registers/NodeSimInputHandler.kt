@@ -1,9 +1,6 @@
 package com.aidanmars.nodesim.game.skija.core.registers
 
-import com.aidanmars.nodesim.game.skija.register.types.input.InputListener
-import com.aidanmars.nodesim.game.skija.register.types.input.KeyListener
-import com.aidanmars.nodesim.game.skija.register.types.input.MouseListener
-import com.aidanmars.nodesim.game.skija.register.types.input.ScrollListener
+import com.aidanmars.nodesim.game.skija.register.types.input.*
 import io.github.humbleui.types.Point
 import org.lwjgl.glfw.GLFW.*
 
@@ -14,6 +11,7 @@ class NodeSimInputHandler {
      * this value is to indicate what listener is listening to mouse events
      */
     private var currentSelectedMouseListener: MouseListener? = null
+    private var currentSelectedListenerLayer: ClickLayer = ClickLayer.World
     private val keyListeners = mutableListOf<KeyListener>()
     private val scrollListeners = mutableListOf<ScrollListener>()
 
@@ -32,21 +30,36 @@ class NodeSimInputHandler {
             GLFW_PRESS -> {
                 currentSelectedMouseListener = null
                 mouseListeners.forEach {
-                    if (it.onPress(location)) {
+                    if (it.onPress(location, ClickLayer.Overlay)) {
+                        currentSelectedListenerLayer = ClickLayer.Overlay
+                        currentSelectedMouseListener = it
+                        return
+                    }
+                }
+                mouseListeners.forEach {
+                    if (it.onPress(location, ClickLayer.Hud)) {
+                        currentSelectedListenerLayer = ClickLayer.Hud
+                        currentSelectedMouseListener = it
+                        return
+                    }
+                }
+                mouseListeners.forEach {
+                    if (it.onPress(location, ClickLayer.World)) {
+                        currentSelectedListenerLayer = ClickLayer.World
                         currentSelectedMouseListener = it
                         return
                     }
                 }
             }
             GLFW_RELEASE -> {
-                currentSelectedMouseListener?.onRelease(location)
+                currentSelectedMouseListener?.onRelease(location, currentSelectedListenerLayer)
                 currentSelectedMouseListener = null
             }
         }
     }
 
     fun onMouseMoveEvent(newLocation: Point) {
-        currentSelectedMouseListener?.onDrag(newLocation)
+        currentSelectedMouseListener?.onDrag(newLocation, currentSelectedListenerLayer)
     }
 
     fun onScrollEvent(xOffset: Double, yOffset: Double) {

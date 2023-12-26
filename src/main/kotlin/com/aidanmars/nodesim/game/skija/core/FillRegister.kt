@@ -1,7 +1,12 @@
 package com.aidanmars.nodesim.game.skija.core
 
 import com.aidanmars.nodesim.game.skija.register.MovementHandler
+import com.aidanmars.nodesim.game.skija.register.VerificationHandler
 import com.aidanmars.nodesim.game.skija.register.hud.*
+import com.aidanmars.nodesim.game.skija.register.tools.ConnectTool
+import com.aidanmars.nodesim.game.skija.register.tools.DeleteTool
+import com.aidanmars.nodesim.game.skija.register.tools.InteractTool
+import com.aidanmars.nodesim.game.skija.register.tools.PlaceTool
 import com.aidanmars.nodesim.game.skija.register.world.BackGroundDrawAble
 import com.aidanmars.nodesim.game.skija.register.world.NodesDrawAble
 
@@ -11,7 +16,7 @@ fun NodeSimWindow.fillRegister() {
 
     // high priority (things like a yes/no screen)
     run {
-
+        register(VerificationHandler(data))
     }
 
     // medium priority (things like the heads-up display)
@@ -23,10 +28,10 @@ fun NodeSimWindow.fillRegister() {
         register(SnapHudElement(data))
 
         // toolbar
-        register(PlaceHudElement(data))
-        register(DeleteHudElement(data))
-        register(InteractHudElement(data))
-        register(ConnectHudElement(data))
+        register(PlaceTool(data))
+        register(DeleteTool(data))
+        register(InteractTool(data))
+        register(ConnectTool(data))
 
         // player movement
         register(MovementHandler(data))
