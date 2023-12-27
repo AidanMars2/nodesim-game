@@ -3,10 +3,7 @@ package com.aidanmars.nodesim.game.skija.core
 import com.aidanmars.nodesim.game.skija.register.MovementHandler
 import com.aidanmars.nodesim.game.skija.register.VerificationHandler
 import com.aidanmars.nodesim.game.skija.register.hud.*
-import com.aidanmars.nodesim.game.skija.register.tools.ConnectTool
-import com.aidanmars.nodesim.game.skija.register.tools.DeleteTool
-import com.aidanmars.nodesim.game.skija.register.tools.InteractTool
-import com.aidanmars.nodesim.game.skija.register.tools.PlaceTool
+import com.aidanmars.nodesim.game.skija.register.tools.*
 import com.aidanmars.nodesim.game.skija.register.world.BackGroundDrawAble
 import com.aidanmars.nodesim.game.skija.register.world.NodesDrawAble
 
@@ -28,6 +25,7 @@ fun NodeSimWindow.fillRegister() {
         register(SnapHudElement(data))
 
         // toolbar
+        register(SelectTool(data))
         register(PlaceTool(data))
         register(DeleteTool(data))
         register(InteractTool(data))

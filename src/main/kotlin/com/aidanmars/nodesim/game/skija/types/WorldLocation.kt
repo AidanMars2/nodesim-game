@@ -10,6 +10,8 @@ data class WorldLocation(val x: Int, val y: Int) {
         return sqrt((dx * dx + dy * dy).toDouble())
     }
 
+    fun middle(other: WorldLocation): WorldLocation = WorldLocation((x + other.x) / 2, (y + other.y) / 2)
+
     fun chunk(): WorldLocation {
         val (chunkX, chunkY) = getChunk(x, y)
         return WorldLocation(chunkX, chunkY)

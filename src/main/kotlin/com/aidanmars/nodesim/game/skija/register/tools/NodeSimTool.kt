@@ -68,7 +68,7 @@ abstract class NodeSimTool : MouseListener, KeyListener, HudDrawAble, WorldDrawA
     }
 
     override fun onKeyPress(key: Int, mods: Int): Boolean {
-        if (key != keyToSelect) return false
+        if (key != keyToSelect || mods != 0) return false
         data.currentTool = toolType
 
         return true

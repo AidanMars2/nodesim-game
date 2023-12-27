@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW
 class InteractTool(override val data: NodeSimData) : NodeSimTool() {
     override val toolType: ToolType = ToolType.Interact
     override val buttonIcon: SVGDOM = SvgDoms.Hud.interactElement
-    override val keyToSelect: Int = GLFW.GLFW_KEY_T
+    override val keyToSelect: Int = GLFW.GLFW_KEY_F
 
     private var pressLocation = WorldLocation(0, 0)
     private var topNodeAtPress: Node? = null

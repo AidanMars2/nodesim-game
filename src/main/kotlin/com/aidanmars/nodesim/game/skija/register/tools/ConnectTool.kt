@@ -15,7 +15,7 @@ import org.lwjgl.glfw.GLFW.*
 class ConnectTool(override val data: NodeSimData) : NodeSimTool() {
     override val toolType: ToolType = ToolType.Connect
     override val buttonIcon: SVGDOM = SvgDoms.Hud.connectElement
-    override val keyToSelect: Int = GLFW_KEY_G
+    override val keyToSelect: Int = GLFW_KEY_C
 
     private var showSelection = false
     private var fromLocation = WorldLocation(0, 0)

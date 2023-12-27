@@ -2,6 +2,7 @@ package com.aidanmars.nodesim.game.skija.core
 
 import com.aidanmars.nodesim.core.Circuit
 import com.aidanmars.nodesim.core.Node
+import com.aidanmars.nodesim.core.extensions.getNodesInRegion
 import com.aidanmars.nodesim.core.extensions.tick
 import com.aidanmars.nodesim.game.skija.core.registers.NodeSimDataListenerHandler
 import com.aidanmars.nodesim.game.skija.distanceToLine
@@ -56,7 +57,12 @@ class NodeSimData(
     private var isSimulating = false
 
     // quick rendering values
-    val nodesOnScreen = mutableSetOf<Node>()
+    val nodesOnScreen: Set<Node>
+        get() {
+            val (topLeftX, topLeftY) = topLeftScreenLocation()
+            val (bottomRightX, bottomRightY) = bottomRightScreenLocation()
+            return circuit.getNodesInRegion(topLeftX..bottomRightX, topLeftY..bottomRightY)
+        }
 
     var placeSnapDistance = 1
     var currentTool = ToolType.Interact
@@ -148,7 +154,6 @@ class NodeSimData(
     fun placeNodeAtLocation(node: Node, location: WorldLocation) {
         val (x, y) = getNodePlaceLocation(location)
         circuit.moveNode(node, x, y)
-        nodesOnScreen.add(node)
     }
     //</editor-fold>
 

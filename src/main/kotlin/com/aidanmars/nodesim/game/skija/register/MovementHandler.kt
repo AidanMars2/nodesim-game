@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW
 import kotlin.math.pow
 
 class MovementHandler(override val data: NodeSimData) :
-    ConstantActor, PlayerMovementListener, ScrollListener, KeyListener
+    ConstantActor, ScrollListener, KeyListener
 {
     private val wasdKeysPressed = BooleanArray(4)
     override fun act(timePassedMillis: Int) {
@@ -24,18 +24,6 @@ class MovementHandler(override val data: NodeSimData) :
         data.playerLocation = WorldLocation(
             (data.playerX + playerXOffset).toInt(),
             (data.playerY + playerYOffset).toInt()
-        )
-    }
-
-    override fun onPlayerMove() {
-        data.nodesOnScreen.clear()
-        val (sx1, sy1) = data.topLeftScreenLocation()
-        val (sx2, sy2) = data.bottomRightScreenLocation()
-        data.nodesOnScreen.addAll(
-            data.circuit.getNodesInRegion(
-                sx1..sx2,
-                sy1..sy2
-            )
         )
     }
 

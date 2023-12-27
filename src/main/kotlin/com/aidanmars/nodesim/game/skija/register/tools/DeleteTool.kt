@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW
 class DeleteTool(override val data: NodeSimData) : NodeSimTool() {
     override val toolType: ToolType = ToolType.Delete
     override val buttonIcon: SVGDOM = SvgDoms.Hud.deleteElement
-    override val keyToSelect: Int = GLFW.GLFW_KEY_R
+    override val keyToSelect: Int = GLFW.GLFW_KEY_X
     override fun drawSelection(canvas: Canvas) {}
 
     override fun onWorldPress(clickLocation: WorldLocation) {
