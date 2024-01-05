@@ -4,6 +4,7 @@ import com.aidanmars.nodesim.core.Circuit
 import com.aidanmars.nodesim.core.Node
 import com.aidanmars.nodesim.core.extensions.getNodesInRegion
 import com.aidanmars.nodesim.core.extensions.tick
+import com.aidanmars.nodesim.game.skija.Analytics
 import com.aidanmars.nodesim.game.skija.core.registers.NodeSimDataListenerHandler
 import com.aidanmars.nodesim.game.skija.distanceToLine
 import com.aidanmars.nodesim.game.skija.location
@@ -22,6 +23,9 @@ import kotlin.time.toDuration
 class NodeSimData(
     val closeGraceFully: () -> Unit
 ) {
+    // analytics
+    val analytics = Analytics()
+
     // listeners
     val dataListenerHandler = NodeSimDataListenerHandler()
 
@@ -61,7 +65,9 @@ class NodeSimData(
         get() {
             val (topLeftX, topLeftY) = topLeftScreenLocation()
             val (bottomRightX, bottomRightY) = bottomRightScreenLocation()
-            return circuit.getNodesInRegion(topLeftX..bottomRightX, topLeftY..bottomRightY)
+            return analytics.measureTime("data.nodesOnScreen") {
+                circuit.getNodesInRegion(topLeftX..bottomRightX, topLeftY..bottomRightY)
+            }
         }
 
     var placeSnapDistance = 1

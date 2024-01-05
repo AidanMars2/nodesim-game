@@ -54,4 +54,10 @@ fun distanceToLine(
     linePoint1: WorldLocation, linePoint2: WorldLocation
 ): Float = calculateClosestPointToLine(point, linePoint1, linePoint2).distanceTo(point).toFloat()
 
+fun Point.middle(other: Point): Point {
+    val dx = x - other.x
+    val dy = y - other.y
+    return Point(x - (dx / 2), y - (dy / 2))
+}
+
 fun Node.location(): WorldLocation = WorldLocation(x, y)

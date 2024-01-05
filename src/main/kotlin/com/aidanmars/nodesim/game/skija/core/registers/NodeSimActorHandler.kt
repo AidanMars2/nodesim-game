@@ -12,8 +12,9 @@ class NodeSimActorHandler {
 
     fun act() {
         val currentTime = System.currentTimeMillis()
+        val millisPassed = (currentTime - lastActCallDate).toInt()
         constantActors.forEach {
-            it.act((currentTime - lastActCallDate).toInt())
+            it.act(millisPassed)
         }
         lastActCallDate = currentTime
     }

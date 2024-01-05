@@ -82,16 +82,16 @@ abstract class Window(val title: String) {
         glfwShowWindow(window)
     }
 
-    private var context: DirectContext? = null
+    private lateinit var context: DirectContext
     private var renderTarget: BackendRenderTarget? = null
     private var surface: Surface? = null
-    private var canvas: Canvas? = null
+    private lateinit var canvas: Canvas
 
     private fun initSkia() {
         Stats.enabled = true
 
-        if (surface != null) surface!!.close()
-        if (renderTarget != null) renderTarget!!.close()
+        surface?.close()
+        renderTarget?.close()
 
         renderTarget = BackendRenderTarget.makeGL(
             (width * dpi).toInt(),
@@ -103,7 +103,7 @@ abstract class Window(val title: String) {
         )
 
         surface = Surface.wrapBackendRenderTarget(
-            context!!,
+            context,
             renderTarget!!,
             SurfaceOrigin.BOTTOM_LEFT,
             SurfaceColorFormat.RGBA_8888,
@@ -124,7 +124,7 @@ abstract class Window(val title: String) {
         glfwSetWindowSizeCallback(window) { window: Long, width: Int, height: Int ->
             updateDimensions()
             initSkia()
-            draw(canvas!!)
+            draw(canvas)
         }
 
         glfwSetCursorPosCallback(window) { window: Long, newX: Double, newY: Double ->
@@ -148,8 +148,8 @@ abstract class Window(val title: String) {
         initSkia()
 
         while (!glfwWindowShouldClose(window)) {
-            draw(canvas!!)
-            context!!.flush()
+            draw(canvas)
+            context.flush()
             glfwSwapBuffers(window)
             glfwPollEvents()
         }

@@ -1,5 +1,6 @@
 package com.aidanmars.nodesim.game.skija.core
 
+import com.aidanmars.nodesim.game.skija.register.AnalyticsHandler
 import com.aidanmars.nodesim.game.skija.register.MovementHandler
 import com.aidanmars.nodesim.game.skija.register.VerificationHandler
 import com.aidanmars.nodesim.game.skija.register.hud.*
@@ -13,6 +14,7 @@ fun NodeSimWindow.fillRegister() {
 
     // high priority (things like a yes/no screen)
     run {
+        register(AnalyticsHandler(data))
         register(VerificationHandler(data))
     }
 
@@ -23,6 +25,9 @@ fun NodeSimWindow.fillRegister() {
 
         // snap distance button
         register(SnapHudElement(data))
+
+        // saving
+        register(SaveTool(data))
 
         // toolbar
         register(SelectTool(data))

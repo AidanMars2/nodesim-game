@@ -38,7 +38,8 @@ class ConnectTool(override val data: NodeSimData) : NodeSimTool() {
                 data.screenPointAt(toLocation),
                 fromNode?.outputPower ?: false,
                 data.scale,
-                canvas
+                canvas,
+                data.analytics
             )
         }
     }

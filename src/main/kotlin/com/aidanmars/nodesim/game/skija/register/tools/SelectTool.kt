@@ -261,7 +261,7 @@ class SelectTool(override val data: NodeSimData) :
         when (state) {
             State.YesNoAwaitPackage -> {
                 if (!answer) return true
-                val (centerX, centerY) = data.getNodePlaceLocation(getSelectionCenter())
+                val (centerX, centerY) = data.getNodePlaceLocation(selectionLocation1.middle(selectionLocation2))
                 data.withCircuitMutexLocked {
                     data.circuit.packageRegion(
                         getSelectionXRegion(),

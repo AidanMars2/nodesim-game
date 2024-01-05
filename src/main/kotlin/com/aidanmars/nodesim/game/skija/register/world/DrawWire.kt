@@ -1,5 +1,6 @@
 package com.aidanmars.nodesim.game.skija.register.world
 
+import com.aidanmars.nodesim.game.skija.Analytics
 import com.aidanmars.nodesim.game.skija.constants.Colors
 import com.aidanmars.nodesim.game.skija.angleBetweenPoints
 import io.github.humbleui.skija.Canvas
@@ -17,21 +18,27 @@ private const val LineWidth = 3f
 fun drawWire(
     from: Point, to: Point,
     power: Boolean, scale: Float,
-    canvas: Canvas
+    canvas: Canvas, analytics: Analytics
 ) {
-    Paint().use {
-        it.strokeWidth = LineEdgeWidth * scale
-        it.color = Colors.wireStructure
-        it.strokeCap = PaintStrokeCap.ROUND
-        canvas.drawLine(from.x, from.y, to.x, to.y, it)
+    canvas.save()
+    analytics.measureTime("world.wires.edge") {
+        Paint().use {
+            it.strokeWidth = LineEdgeWidth * scale
+            it.color = Colors.wireStructure
+            it.strokeCap = PaintStrokeCap.ROUND
+            analytics.measureTime("world.wires.parts.edge") { canvas.drawLine(from.x, from.y, to.x, to.y, it) }
+        }
     }
-    drawWireTriangle(from, to, power, scale, canvas)
-    Paint().use {
-        it.strokeWidth = LineWidth * scale
-        it.strokeCap = PaintStrokeCap.ROUND
-        it.color = if (power) Colors.wireOnInner else Colors.wireOffInner
-        canvas.drawLine(from.x, from.y, to.x, to.y, it)
+    analytics.measureTime("world.wires.triangle") { drawWireTriangle(from, to, power, scale, canvas, analytics) }
+    analytics.measureTime("world.wires.indicator") {
+        Paint().use {
+            it.strokeWidth = LineWidth * scale
+            it.strokeCap = PaintStrokeCap.ROUND
+            it.color = if (power) Colors.wireOnInner else Colors.wireOffInner
+            analytics.measureTime("world.wires.parts.indicator") { canvas.drawLine(from.x, from.y, to.x, to.y, it) }
+        }
     }
+    canvas.restore()
 }
 
 private const val triangleAngle = (PI / 4) * 3
@@ -41,7 +48,7 @@ private const val innerTriangleDistance = 9f
 private fun drawWireTriangle(
     from: Point, to: Point,
     power: Boolean, scale: Float,
-    canvas: Canvas
+    canvas: Canvas, analytics: Analytics
 ) {
     val triangleLocation = from.middle(to)
     val angle = angleBetweenPoints(from, to)
@@ -67,13 +74,15 @@ private fun drawWireTriangle(
         )
         Paint().use {
             it.color = color
-            canvas.drawPath(
-                Path().moveTo(mainPoint)
-                    .lineTo(firstBackPoint)
-                    .lineTo(secondBackPoint)
-                    .closePath(),
-                it
-            )
+            analytics.measureTime("world.wires.parts.triangle") {
+                canvas.drawPath(
+                    Path().moveTo(mainPoint)
+                        .lineTo(firstBackPoint)
+                        .lineTo(secondBackPoint)
+                        .closePath(),
+                    it
+                )
+            }
         }
     }
     drawSingleTriangle(outerTriangleDistance, Colors.wireStructure)
